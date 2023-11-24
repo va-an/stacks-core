@@ -1262,14 +1262,18 @@ impl fmt::Display for Value {
             Value::Sequence(SequenceData::Buffer(vec_bytes)) => write!(f, "0x{}", &vec_bytes),
             Value::Sequence(SequenceData::String(string)) => write!(f, "{}", string),
             Value::Sequence(SequenceData::List(list_data)) => {
-                write!(f, "(")?;
-                for (ix, v) in list_data.data.iter().enumerate() {
-                    if ix > 0 {
-                        write!(f, " ")?;
+                if list_data.data.is_empty() {
+                    write!(f, "(list)")
+                } else {
+                    write!(f, "(list ")?;
+                    for (ix, v) in list_data.data.iter().enumerate() {
+                        if ix > 0 {
+                            write!(f, " ")?;
+                        }
+                        write!(f, "{}", v)?;
                     }
-                    write!(f, "{}", v)?;
+                    write!(f, ")")
                 }
-                write!(f, ")")
             }
             Value::CallableContract(callable_data) => write!(f, "{}", callable_data),
         }
