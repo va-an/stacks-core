@@ -195,8 +195,8 @@ pub const UTF8_40: TypeSignature = SequenceType(SequenceSubtype::StringType(Stri
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ListTypeData {
-    max_len: u32,
-    entry_type: Box<TypeSignature>,
+    pub max_len: u32,
+    pub entry_type: Box<TypeSignature>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
