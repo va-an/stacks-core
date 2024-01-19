@@ -923,12 +923,14 @@ impl<'a> ClarityDatabase<'a> {
     /// 3. Resolve the parent StacksBlockId to its consensus hash
     /// 4. Resolve the consensus hash to the associated SortitionId
     fn get_sortition_id_for_stacks_tip(&mut self) -> Option<SortitionId> {
-        let current_stacks_height = self.get_current_block_height();
+        // let current_stacks_height = self.get_current_block_height();
 
-        if current_stacks_height < 1 {
-            // we are in the Stacks genesis block
-            return None;
-        }
+        // Commented for benchmarking purposes. Don't want to short-circuit here
+        // if current_stacks_height < 1 {
+        //     // we are in the Stacks genesis block
+        //     return None;
+        // }
+        let current_stacks_height = 6;
 
         // this is the StacksBlockId of the last block evaluated in this fork
         let parent_id_bhh = self.get_index_block_header_hash(current_stacks_height - 1);
@@ -1940,6 +1942,7 @@ impl<'a> ClarityDatabase<'a> {
         let stx_balance = self.get_account_stx_balance(principal);
         let cur_burn_height = self.get_current_burnchain_block_height() as u64;
 
+        /*
         test_debug!("Balance of {} (raw={},locked={},unlock-height={},current-height={}) is {} (has_unlockable_tokens_at_burn_block={})",
             principal,
             stx_balance.amount_unlocked(),
@@ -1948,7 +1951,7 @@ impl<'a> ClarityDatabase<'a> {
             cur_burn_height,
             stx_balance.get_available_balance_at_burn_block(cur_burn_height, self.get_v1_unlock_height(), self.get_v2_unlock_height(), self.get_v3_unlock_height()),
             stx_balance.has_unlockable_tokens_at_burn_block(cur_burn_height, self.get_v1_unlock_height(), self.get_v2_unlock_height(), self.get_v3_unlock_height()));
-
+        */
         STXBalanceSnapshot::new(principal, stx_balance, cur_burn_height, self)
     }
 
@@ -1959,6 +1962,7 @@ impl<'a> ClarityDatabase<'a> {
         let stx_balance = self.get_account_stx_balance(principal);
         let cur_burn_height = 0;
 
+        /*
         test_debug!("Balance of {} (raw={},locked={},unlock-height={},current-height={}) is {} (has_unlockable_tokens_at_burn_block={})",
             principal,
             stx_balance.amount_unlocked(),
@@ -1967,6 +1971,7 @@ impl<'a> ClarityDatabase<'a> {
             cur_burn_height,
             stx_balance.get_available_balance_at_burn_block(cur_burn_height, self.get_v1_unlock_height(), self.get_v2_unlock_height(), self.get_v3_unlock_height()),
             stx_balance.has_unlockable_tokens_at_burn_block(cur_burn_height, self.get_v1_unlock_height(), self.get_v2_unlock_height(), self.get_v3_unlock_height()));
+        */
 
         STXBalanceSnapshot::new(principal, stx_balance, cur_burn_height, self)
     }

@@ -56,6 +56,12 @@ pub fn check_special_some(
     Ok(resp_type)
 }
 
+#[cfg(any(test, feature = "benchmarking"))]
+pub fn bench_analysis_option_cons_helper(type_sig: TypeSignature) -> TypeResult {
+    let resp_type = TypeSignature::new_option(type_sig)?;
+    Ok(resp_type)
+}
+
 pub fn check_special_error(
     checker: &mut TypeChecker,
     args: &[SymbolicExpression],
@@ -85,6 +91,15 @@ pub fn check_special_is_response(
         Ok(TypeSignature::BoolType)
     } else {
         Err(CheckErrors::ExpectedResponseType(input.clone()).into())
+    }
+}
+
+#[cfg(any(test, feature = "benchmarking"))]
+pub fn bench_analysis_option_check_helper(input: TypeSignature) -> TypeResult {
+    if let TypeSignature::ResponseType(_types) = input {
+        return Ok(TypeSignature::BoolType);
+    } else {
+        return Err(CheckErrors::ExpectedResponseType(input.clone()).into());
     }
 }
 

@@ -1103,7 +1103,7 @@ impl StacksChainState {
         Ok(())
     }
 
-    fn open_db(
+    pub fn open_db(
         mainnet: bool,
         chain_id: u32,
         index_path: &str,

@@ -62,6 +62,7 @@ wasm = ["stacks_common/wasm", "developer-mode", "log"]
 developer-mode = ["stacks_common/developer-mode"]
 slog_json = ["stacks_common/slog_json"]
 testing = ["canonical"]
+benchmarking = []
 
 [target.'cfg(all(target_arch = "x86_64", not(target_env = "msvc")))'.dependencies]
 sha2-asm = "0.5.3"

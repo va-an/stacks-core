@@ -20,6 +20,7 @@ pub mod natives;
 use std::collections::{BTreeMap, HashMap};
 use std::convert::TryInto;
 
+use rand::Rng;
 use stacks_common::types::StacksEpochId;
 
 use self::contexts::ContractContext;
@@ -76,9 +77,9 @@ Is illegally typed in our language.
 
 pub struct TypeChecker<'a, 'b> {
     pub type_map: TypeMap,
-    contract_context: ContractContext,
+    pub contract_context: ContractContext,
     function_return_tracker: Option<Option<TypeSignature>>,
-    db: &'a mut AnalysisDatabase<'b>,
+    pub db: &'a mut AnalysisDatabase<'b>,
     pub cost_track: LimitedCostTracker,
     clarity_version: ClarityVersion,
 }
@@ -313,6 +314,7 @@ impl FunctionType {
 
                 Ok(TypeSignature::BoolType)
             }
+            FunctionType::RandomVariadic => Ok(TypeSignature::BoolType),
         }
     }
 
@@ -836,6 +838,12 @@ fn trait_type_size(trait_sig: &BTreeMap<ClarityName, FunctionSignature>) -> Chec
     Ok(total_size)
 }
 
+/// Make `trait_type_size()` public for testing
+#[cfg(any(test, feature = "testing"))]
+pub fn _trait_type_size(trait_sig: &BTreeMap<ClarityName, FunctionSignature>) -> CheckResult<u64> {
+    trait_type_size(trait_sig)
+}
+
 fn contract_analysis_size(contract: &ContractAnalysis) -> CheckResult<u64> {
     let mut total_size = contract.public_function_types.len() as u64;
     total_size = total_size.cost_overflow_add(contract.read_only_function_types.len() as u64)?;
@@ -884,6 +892,37 @@ impl<'a, 'b> TypeChecker<'a, 'b> {
             type_map: TypeMap::new(),
             clarity_version: *clarity_version,
         }
+    }
+
+    /// Make `new()` public for testing
+    #[cfg(any(test, feature = "testing"))]
+    pub fn _new(
+        db: &'a mut AnalysisDatabase<'b>,
+        cost_track: LimitedCostTracker,
+        contract_identifier: &QualifiedContractIdentifier,
+        clarity_version: &ClarityVersion,
+    ) -> TypeChecker<'a, 'b> {
+        Self::new(db, cost_track, contract_identifier, clarity_version)
+    }
+
+    #[cfg(any(test, feature = "testing"))]
+    pub fn get_contract_context(self) -> ContractContext {
+        self.contract_context
+    }
+
+    #[cfg(any(test, feature = "testing"))]
+    pub fn get_contract_context_clone(self) -> ContractContext {
+        self.contract_context.clone()
+    }
+
+    #[cfg(any(test, feature = "testing"))]
+    pub fn get_db(self) -> &'a mut AnalysisDatabase<'b> {
+        self.db
+    }
+
+    #[cfg(any(test, feature = "testing"))]
+    pub fn set_function_return_tracker(&mut self, val: Option<Option<TypeSignature>>) {
+        self.function_return_tracker = val;
     }
 
     fn into_contract_analysis(
@@ -1221,6 +1260,12 @@ impl<'a, 'b> TypeChecker<'a, 'b> {
         }
     }
 
+    /// Make `lookup_variable()` public for testing
+    #[cfg(any(test, feature = "testing"))]
+    pub fn _lookup_variable(&mut self, name: &str, context: &TypingContext) -> TypeResult {
+        Self::lookup_variable(self, name, context)
+    }
+
     fn clarity1_type_check_expects(
         &mut self,
         expr: &SymbolicExpression,
@@ -1406,6 +1451,17 @@ impl<'a, 'b> TypeChecker<'a, 'b> {
         Ok((trait_name.clone(), trait_signature))
     }
 
+    /// Make `type_check_define_trait()` public for testing
+    #[cfg(any(test, feature = "testing"))]
+    pub fn _type_check_define_trait(
+        &mut self,
+        trait_name: &ClarityName,
+        function_types: &[SymbolicExpression],
+        _context: &mut TypingContext,
+    ) -> CheckResult<(ClarityName, BTreeMap<ClarityName, FunctionSignature>)> {
+        Self::type_check_define_trait(self, trait_name, function_types, _context)
+    }
+
     // Checks if an expression is a _define_ expression, and if so, typechecks it. Otherwise, it returns Ok(None)
     fn try_type_check_define(
         &mut self,
@@ -1414,7 +1470,8 @@ impl<'a, 'b> TypeChecker<'a, 'b> {
     ) -> CheckResult<Option<()>> {
         if let Some(define_type) = DefineFunctionsParsed::try_parse(expression)? {
             match define_type {
-                DefineFunctionsParsed::Constant { name, value } => {
+                DefineFunctionsParsed::Constant { name, value }
+                | DefineFunctionsParsed::ConstantBench { name, value } => {
                     let (v_name, v_type) = self.type_check_define_variable(name, value, context)?;
                     runtime_cost(
                         ClarityCostFunction::AnalysisBindName,
@@ -1572,5 +1629,85 @@ impl<'a, 'b> TypeChecker<'a, 'b> {
             // not a define.
             Ok(None)
         }
+    }
+
+    /// Make `_try_type_check_define()` public for testing
+    #[cfg(any(test, feature = "testing"))]
+    pub fn _try_type_check_define(
+        &mut self,
+        expression: &SymbolicExpression,
+        context: &mut TypingContext,
+    ) -> CheckResult<Option<()>> {
+        Self::try_type_check_define(self, expression, context)
+    }
+
+    #[cfg(any(test, feature = "benchmarking"))]
+    pub fn bench_analysis_visit_helper(
+        &mut self,
+        expr: &SymbolicExpression,
+        _context: &TypingContext,
+    ) -> TypeResult {
+        match expr.expr {
+            AtomValue(_) | LiteralValue(_) => Ok(TypeSignature::BoolType),
+            Atom(_) => Ok(TypeSignature::BoolType),
+            List(_) => Ok(TypeSignature::BoolType),
+            TraitReference(_, _) | Field(_) => Ok(TypeSignature::BoolType),
+        }
+    }
+
+    #[cfg(any(test, feature = "benchmarking"))]
+    pub fn bench_analysis_check_let_helper(
+        &mut self,
+        mut types_returned: Vec<TypeSignature>,
+        _context: &TypingContext,
+    ) -> TypeResult {
+        let last_return = types_returned
+            .pop()
+            .ok_or(CheckError::new(CheckErrors::CheckerImplementationFailure))?;
+
+        for type_return in types_returned.iter() {
+            if type_return.is_response_type() {
+                return Err(CheckErrors::UncheckedIntermediaryResponses.into());
+            }
+        }
+        Ok(last_return)
+    }
+
+    #[cfg(any(test, feature = "benchmarking"))]
+    pub fn bench_analysis_lookup_variable_depth_helper(
+        &mut self,
+        name: &str,
+        context: &TypingContext,
+    ) -> TypeResult {
+        if let Some(type_result) = context.lookup_variable_type(name) {
+            Ok(type_result.clone())
+        } else {
+            Err(CheckErrors::UndefinedVariable(name.to_string()).into())
+        }
+    }
+
+    #[cfg(any(test, feature = "benchmarking"))]
+    pub fn bench_analysis_bind_name_helper(&mut self, type_sig: TypeSignature) -> CheckResult<()> {
+        // setup
+        let mut rng = rand::thread_rng();
+        let char_name = (0..15)
+            .map(|_| rng.gen_range(b'a', b'z') as char)
+            .collect::<String>();
+        let clar_name = ClarityName::try_from(char_name.clone()).unwrap();
+
+        self.contract_context.add_variable_type(clar_name, type_sig)
+    }
+
+    #[cfg(any(test, feature = "benchmarking"))]
+    pub fn bench_analysis_use_trait_entry_in_context(
+        db: &mut AnalysisDatabase,
+        trait_identifier: &TraitIdentifier,
+    ) {
+        db.get_defined_trait(
+            &trait_identifier.contract_identifier,
+            &trait_identifier.name,
+            &StacksEpochId::latest(),
+        )
+        .unwrap();
     }
 }
