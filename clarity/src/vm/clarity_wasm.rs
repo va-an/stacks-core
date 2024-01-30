@@ -369,7 +369,7 @@ impl<'a, 'b> ClarityWasmContext<'a, 'b> {
 }
 
 /// Push a placeholder value for Wasm type `ty` onto the data stack.
-fn placeholder_for_type(ty: ValType) -> Val {
+pub fn placeholder_for_type(ty: ValType) -> Val {
     match ty {
         ValType::I32 => Val::I32(0),
         ValType::I64 => Val::I64(0),
@@ -1843,7 +1843,7 @@ fn wasm_to_clarity_value(
 }
 
 /// Link the host interface functions for into the Wasm module.
-fn link_host_functions(linker: &mut Linker<ClarityWasmContext>) -> Result<(), Error> {
+pub fn link_host_functions(linker: &mut Linker<ClarityWasmContext>) -> Result<(), Error> {
     link_define_function_fn(linker)?;
     link_define_variable_fn(linker)?;
     link_define_ft_fn(linker)?;
