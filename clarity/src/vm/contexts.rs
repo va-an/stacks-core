@@ -18,12 +18,13 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 use std::mem::replace;
 
-use hashbrown::{HashMap, HashSet};
+//use hashbrown::{HashMap, HashSet};
 use serde::Serialize;
 use serde_json::json;
 use stacks_common::consts::CHAIN_ID_TESTNET;
 use stacks_common::types::chainstate::StacksBlockId;
 use stacks_common::types::StacksEpochId;
+use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 
 use super::EvalHook;
 use crate::vm::ast::{ASTRules, ContractAST};
@@ -205,7 +206,8 @@ pub struct GlobalContext<'a, 'hooks> {
     pub eval_hooks: Option<Vec<&'hooks mut dyn EvalHook>>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub struct ContractContext {
     pub contract_identifier: QualifiedContractIdentifier,
     pub variables: HashMap<ClarityName, Value>,

@@ -32,6 +32,7 @@ pub mod raw {
     use rand::Rng;
 
     use super::ENGLISH_WORDS;
+    use crate::vm::callables::DefinedFunction;
     use crate::vm::representations::Span;
     use crate::vm::types::signatures::{CallableSubtype, FunctionArgSignature};
     use crate::vm::types::{
@@ -96,6 +97,31 @@ pub mod raw {
                 data: ENGLISH_WORDS[rng.gen_range(0..ENGLISH_WORDS.len() - 1)]
                     .as_bytes()
                     .to_vec(),
+            }
+        }
+    }
+
+    impl Dummy<Faker> for DefinedFunction {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
+
+            let arg_types: Vec<TypeSignature> = (0..rng.gen_range(1..3))
+                .into_iter()
+                .map(|_| random_type_signature(None, rng))
+                .collect();
+
+            let arguments: Vec<ClarityName> = (0..arg_types.len())
+                .into_iter()
+                .map(|_| Faker.fake_with_rng(rng))
+                .collect();
+
+            DefinedFunction {
+                define_type: Faker.fake_with_rng(rng),
+                name: Faker.fake_with_rng(rng), 
+                arg_types,
+                arguments,
+                body: Faker.fake_with_rng(rng),
+                identifier: Faker.fake_with_rng(rng),
+
             }
         }
     }

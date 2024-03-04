@@ -56,20 +56,21 @@ pub enum CallableType {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub enum DefineType {
     ReadOnly,
     Public,
     Private,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct DefinedFunction {
-    identifier: FunctionIdentifier,
-    name: ClarityName,
-    arg_types: Vec<TypeSignature>,
+    pub identifier: FunctionIdentifier,
+    pub name: ClarityName,
+    pub arg_types: Vec<TypeSignature>,
     pub define_type: DefineType,
-    arguments: Vec<ClarityName>,
-    body: SymbolicExpression,
+    pub arguments: Vec<ClarityName>,
+    pub body: SymbolicExpression,
 }
 
 /// This enum handles the actual invocation of the method
@@ -120,6 +121,7 @@ pub fn cost_input_sized_vararg(args: &[Value]) -> Result<u64> {
 }
 
 #[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub struct FunctionIdentifier {
     identifier: String,
 }

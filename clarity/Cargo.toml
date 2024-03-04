@@ -31,7 +31,7 @@ stacks_common = { package = "stacks-common", path = "../stacks-common" }
 rstest = "0.17.0"
 rstest_reuse = "0.5.0"
 hashbrown = { workspace = true }
-fake = { version = "2.9.2", features = ["derive"] }
+fake = { version = "2.9.2", features = ["derive"], optional = true }
 
 [dependencies.serde_json]
 version = "1.0"
@@ -47,6 +47,7 @@ features = ["std"]
 
 [dev-dependencies]
 assert-json-diff = "1.0.0"
+stacks_common = { package = "stacks-common", path = "../stacks-common", features = ["testing"] }
 # a nightly rustc regression (35dbef235 2021-03-02) prevents criterion from compiling
 #  but it isn't necessary for tests: only benchmarks. therefore, commenting out for now.
 # criterion = "0.3"
@@ -55,5 +56,5 @@ assert-json-diff = "1.0.0"
 default = []
 developer-mode = []
 slog_json = ["stacks_common/slog_json"]
-testing = []
+testing = ["dep:fake"]
 

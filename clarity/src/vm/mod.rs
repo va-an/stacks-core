@@ -47,7 +47,7 @@ pub mod tests;
 #[cfg(any(test, feature = "testing"))]
 pub mod test_util;
 
-#[cfg(any(test, feature = "testing"))]
+#[cfg(feature = "testing")]
 pub mod fakes;
 
 pub mod clarity;
