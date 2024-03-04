@@ -3570,6 +3570,7 @@ dependencies = [
  "criterion",
  "curve25519-dalek 2.0.0",
  "ed25519-dalek",
+ "fake",
  "hashbrown 0.14.3",
  "integer-sqrt",
  "lazy_static",
