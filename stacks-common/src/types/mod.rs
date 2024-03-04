@@ -13,9 +13,9 @@ use crate::util::hash::Hash160;
 use crate::util::secp256k1::{MessageSignature, Secp256k1PublicKey};
 
 pub mod chainstate;
-pub mod net;
 pub mod hashmap;
 pub mod hashset;
+pub mod net;
 
 pub use hashmap::StacksHashMap;
 pub use hashset::StacksHashSet;

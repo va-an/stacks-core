@@ -23,8 +23,7 @@ use serde::Serialize;
 use serde_json::json;
 use stacks_common::consts::CHAIN_ID_TESTNET;
 use stacks_common::types::chainstate::StacksBlockId;
-use stacks_common::types::StacksEpochId;
-use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
+use stacks_common::types::{StacksEpochId, StacksHashMap as HashMap, StacksHashSet as HashSet};
 
 use super::EvalHook;
 use crate::vm::ast::{ASTRules, ContractAST};

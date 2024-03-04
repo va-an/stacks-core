@@ -103,7 +103,6 @@ pub mod raw {
 
     impl Dummy<Faker> for DefinedFunction {
         fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
-
             let arg_types: Vec<TypeSignature> = (0..rng.gen_range(1..3))
                 .into_iter()
                 .map(|_| random_type_signature(None, rng))
@@ -116,12 +115,11 @@ pub mod raw {
 
             DefinedFunction {
                 define_type: Faker.fake_with_rng(rng),
-                name: Faker.fake_with_rng(rng), 
+                name: Faker.fake_with_rng(rng),
                 arg_types,
                 arguments,
                 body: Faker.fake_with_rng(rng),
                 identifier: Faker.fake_with_rng(rng),
-
             }
         }
     }
@@ -177,7 +175,12 @@ pub mod raw {
                     ))),
                     TypeSignature::TupleType(TupleTypeSignature {
                         type_map: (0..rng.gen_range(1..3))
-                            .map(|_| (Faker.fake_with_rng(rng), random_type_signature(next_level, rng)))
+                            .map(|_| {
+                                (
+                                    Faker.fake_with_rng(rng),
+                                    random_type_signature(next_level, rng),
+                                )
+                            })
                             .collect(),
                     }),
                 ];
@@ -251,7 +254,12 @@ pub mod raw {
                             .collect(),
                         type_signature: TupleTypeSignature {
                             type_map: (0..rng.gen_range(1..3))
-                                .map(|_| (Faker.fake_with_rng(rng), random_type_signature(next_level, rng)))
+                                .map(|_| {
+                                    (
+                                        Faker.fake_with_rng(rng),
+                                        random_type_signature(next_level, rng),
+                                    )
+                                })
                                 .collect(),
                         },
                     }),
@@ -366,7 +374,11 @@ pub mod raw {
                 FunctionType::ArithmeticUnary,
                 FunctionType::ArithmeticComparison,
                 FunctionType::ArithmeticVariadic,
-                FunctionType::Binary(Faker.fake_with_rng(rng), Faker.fake_with_rng(rng), Faker.fake_with_rng(rng)),
+                FunctionType::Binary(
+                    Faker.fake_with_rng(rng),
+                    Faker.fake_with_rng(rng),
+                    Faker.fake_with_rng(rng),
+                ),
             ];
 
             fn_types[rng.gen_range(0..fn_types.len())].clone()
