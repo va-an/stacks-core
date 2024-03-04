@@ -76,14 +76,14 @@ impl AssetIdentifier {
 
 #[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TupleTypeSignature {
-    type_map: BTreeMap<ClarityName, TypeSignature>,
+    pub type_map: BTreeMap<ClarityName, TypeSignature>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-pub struct BufferLength(u32);
+pub struct BufferLength(pub u32);
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct StringUTF8Length(u32);
+pub struct StringUTF8Length(pub u32);
 
 // INVARIANTS enforced by the Type Signatures.
 //   1. A TypeSignature constructor will always fail rather than construct a
@@ -151,6 +151,7 @@ pub enum StringSubtype {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Hash)]
+#[cfg_attr(any(test, feature = "testing"), derive(fake::Dummy))]
 pub enum CallableSubtype {
     Principal(QualifiedContractIdentifier),
     Trait(TraitIdentifier),
@@ -221,8 +222,8 @@ pub const UTF8_40: TypeSignature = SequenceType(SequenceSubtype::StringType(Stri
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ListTypeData {
-    max_len: u32,
-    entry_type: Box<TypeSignature>,
+    pub max_len: u32,
+    pub entry_type: Box<TypeSignature>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -244,6 +245,7 @@ pub enum FunctionArgSignature {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(any(test, feature = "testing"), derive(fake::Dummy))]
 pub enum FunctionReturnsSignature {
     TypeOfArgAtPosition(usize),
     Fixed(TypeSignature),
