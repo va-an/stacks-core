@@ -14,6 +14,11 @@ use crate::util::secp256k1::{MessageSignature, Secp256k1PublicKey};
 
 pub mod chainstate;
 pub mod net;
+pub mod hashmap;
+pub mod hashset;
+
+pub use hashmap::StacksHashMap;
+pub use hashset::StacksHashSet;
 
 /// A container for public keys (compressed secp256k1 public keys)
 pub struct StacksPublicKeyBuffer(pub [u8; 33]);
