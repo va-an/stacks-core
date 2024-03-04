@@ -1,4 +1,18 @@
-#![allow(non_snake_case)]
+// Copyright (C) 2013-2020 Blockstack PBC, a public benefit corporation
+// Copyright (C) 2020 Stacks Open Internet Foundation
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 use fake::locales::EN;
 use fake::Dummy;
@@ -11,7 +25,6 @@ use self::raw::*;
 
 pub mod raw {
     use std::collections::BTreeMap;
-    use std::sync::atomic::AtomicU32;
 
     use fake::locales::EN;
     use fake::{Dummy, Fake, Faker};
@@ -32,38 +45,38 @@ pub mod raw {
     const MAX_RECURSION_LEVEL: u32 = 1;
 
     impl Dummy<Faker> for StandardPrincipalData {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &Faker, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
             StandardPrincipalData(1, rng.gen())
         }
     }
 
     pub struct EnglishWord<L>(pub L);
     impl Dummy<EnglishWord<EN>> for &'static str {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &EnglishWord<EN>, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &EnglishWord<EN>, rng: &mut R) -> Self {
             ENGLISH_WORDS[rng.gen_range(0..ENGLISH_WORDS.len() - 1)]
         }
     }
 
     impl Dummy<EnglishWord<EN>> for String {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &EnglishWord<EN>, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &EnglishWord<EN>, rng: &mut R) -> Self {
             ENGLISH_WORDS[rng.gen_range(0..ENGLISH_WORDS.len() - 1)].into()
         }
     }
 
     impl Dummy<Faker> for ClarityName {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &Faker, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
             ClarityName::from(ENGLISH_WORDS[rng.gen_range(0..ENGLISH_WORDS.len() - 1)])
         }
     }
 
     impl Dummy<Faker> for ContractName {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &Faker, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
             ContractName::from(ENGLISH_WORDS[rng.gen_range(0..ENGLISH_WORDS.len() - 1)])
         }
     }
 
     impl Dummy<Faker> for UTF8Data {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &Faker, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
             let val = Value::string_utf8_from_string_utf8_literal(
                 ENGLISH_WORDS[rng.gen_range(0..ENGLISH_WORDS.len() - 1)].to_string(),
             )
@@ -78,7 +91,7 @@ pub mod raw {
     }
 
     impl Dummy<Faker> for ASCIIData {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &Faker, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
             ASCIIData {
                 data: ENGLISH_WORDS[rng.gen_range(0..ENGLISH_WORDS.len() - 1)]
                     .as_bytes()
@@ -88,11 +101,12 @@ pub mod raw {
     }
 
     impl Dummy<Faker> for TypeSignature {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &Faker, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
             random_type_signature(None, rng)
         }
     }
 
+    /// Generate a random `TypeSignature` instance.
     fn random_type_signature<R: Rng + ?Sized>(level: Option<u32>, rng: &mut R) -> TypeSignature {
         let next_level = Some(level.unwrap_or_default() + 1);
 
@@ -110,15 +124,15 @@ pub mod raw {
             TypeSignature::SequenceType(SequenceSubtype::BufferType(BufferLength(
                 rng.gen_range(50..100),
             ))),
-            TypeSignature::CallableType(CallableSubtype::Principal(Faker.fake())),
+            TypeSignature::CallableType(CallableSubtype::Principal(Faker.fake_with_rng(rng))),
             TypeSignature::TraitReferenceType(TraitIdentifier {
-                name: Faker.fake(),
-                contract_identifier: Faker.fake(),
+                name: Faker.fake_with_rng(rng),
+                contract_identifier: Faker.fake_with_rng(rng),
             }),
             TypeSignature::ListUnionType(
                 (0..rng.gen_range(1..3))
                     .into_iter()
-                    .map(|_| Faker.fake())
+                    .map(|_| Faker.fake_with_rng(rng))
                     .collect(),
             ),
         ];
@@ -137,7 +151,7 @@ pub mod raw {
                     ))),
                     TypeSignature::TupleType(TupleTypeSignature {
                         type_map: (0..rng.gen_range(1..3))
-                            .map(|_| (Faker.fake(), random_type_signature(next_level, rng)))
+                            .map(|_| (Faker.fake_with_rng(rng), random_type_signature(next_level, rng)))
                             .collect(),
                     }),
                 ];
@@ -150,11 +164,12 @@ pub mod raw {
     }
 
     impl Dummy<Faker> for SymbolicExpressionType {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &Faker, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
             random_symbolic_expression_type(None, rng)
         }
     }
 
+    /// Generate a random `SymbolicExpressionType` instance.
     fn random_symbolic_expression_type<R: Rng + ?Sized>(
         level: Option<u32>,
         rng: &mut R,
@@ -162,7 +177,7 @@ pub mod raw {
         let next_level = Some(level.unwrap_or_default() + 1);
 
         let mut types = vec![
-            SymbolicExpressionType::Atom(Faker.fake()),
+            SymbolicExpressionType::Atom(Faker.fake_with_rng(rng)),
             SymbolicExpressionType::LiteralValue(random_value(next_level, rng)),
         ];
 
@@ -171,7 +186,7 @@ pub mod raw {
                 let mut recursive_types = vec![SymbolicExpressionType::List(
                     (1..rng.gen_range(1..3))
                         .into_iter()
-                        .map(|_| Faker.fake())
+                        .map(|_| Faker.fake_with_rng(rng))
                         .collect(),
                 )];
 
@@ -183,20 +198,21 @@ pub mod raw {
     }
 
     impl Dummy<Faker> for Value {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &Faker, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
             random_value(None, rng)
         }
     }
 
+    /// Generate a random `Value` instance.
     fn random_value<R: Rng + ?Sized>(level: Option<u32>, rng: &mut R) -> Value {
         let next_level = Some(level.unwrap_or_default() + 1);
 
         let mut values = vec![
-            Value::Bool(Faker.fake()),
-            Value::Int(Faker.fake()),
-            Value::UInt(Faker.fake()),
-            Value::Principal(Faker.fake()),
-            Value::CallableContract(Faker.fake()),
+            Value::Bool(Faker.fake_with_rng(rng)),
+            Value::Int(Faker.fake_with_rng(rng)),
+            Value::UInt(Faker.fake_with_rng(rng)),
+            Value::Principal(Faker.fake_with_rng(rng)),
+            Value::CallableContract(Faker.fake_with_rng(rng)),
         ];
 
         if let Some(lvl) = level {
@@ -205,11 +221,11 @@ pub mod raw {
                     Value::Tuple(TupleData {
                         data_map: (0..rng.gen_range(1..3))
                             .into_iter()
-                            .map(|_| (Faker.fake(), random_value(next_level, rng)))
+                            .map(|_| (Faker.fake_with_rng(rng), random_value(next_level, rng)))
                             .collect(),
                         type_signature: TupleTypeSignature {
                             type_map: (0..rng.gen_range(1..3))
-                                .map(|_| (Faker.fake(), random_type_signature(next_level, rng)))
+                                .map(|_| (Faker.fake_with_rng(rng), random_type_signature(next_level, rng)))
                                 .collect(),
                         },
                     }),
@@ -221,7 +237,7 @@ pub mod raw {
                         },
                     }),
                     Value::Response(ResponseData {
-                        committed: Faker.fake(),
+                        committed: Faker.fake_with_rng(rng),
                         data: Box::new(random_value(next_level, rng)),
                     }),
                     Value::string_utf8_from_string_utf8_literal(
@@ -260,7 +276,7 @@ pub mod raw {
     }
 
     impl Dummy<Faker> for FunctionSignature {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &Faker, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
             FunctionSignature {
                 args: (0..rng.gen_range(1..3))
                     .into_iter()
@@ -272,11 +288,11 @@ pub mod raw {
     }
 
     impl Dummy<Faker> for FixedFunction {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &Faker, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
             FixedFunction {
                 args: (0..rng.gen_range(1..3))
                     .into_iter()
-                    .map(|_| Faker.fake())
+                    .map(|_| Faker.fake_with_rng(rng))
                     .collect(),
                 returns: random_type_signature(None, rng),
             }
@@ -284,16 +300,16 @@ pub mod raw {
     }
 
     impl Dummy<Faker> for FunctionArg {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &Faker, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
             FunctionArg {
-                name: Faker.fake(),
+                name: Faker.fake_with_rng(rng),
                 signature: random_type_signature(None, rng),
             }
         }
     }
 
     impl Dummy<Faker> for FunctionArgSignature {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &Faker, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
             let sigs = vec![
                 FunctionArgSignature::Union(
                     (0..rng.gen_range(1..2))
@@ -309,10 +325,10 @@ pub mod raw {
     }
 
     impl Dummy<Faker> for FunctionType {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &Faker, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
             let fn_types = vec![
-                FunctionType::Fixed(Faker.fake()),
-                FunctionType::Variadic(Faker.fake(), Faker.fake()),
+                FunctionType::Fixed(Faker.fake_with_rng(rng)),
+                FunctionType::Variadic(Faker.fake_with_rng(rng), Faker.fake_with_rng(rng)),
                 FunctionType::UnionArgs(
                     (0..rng.gen_range(1..2))
                         .into_iter()
@@ -324,7 +340,7 @@ pub mod raw {
                 FunctionType::ArithmeticUnary,
                 FunctionType::ArithmeticComparison,
                 FunctionType::ArithmeticVariadic,
-                FunctionType::Binary(Faker.fake(), Faker.fake(), Faker.fake()),
+                FunctionType::Binary(Faker.fake_with_rng(rng), Faker.fake_with_rng(rng), Faker.fake_with_rng(rng)),
             ];
 
             fn_types[rng.gen_range(0..fn_types.len())].clone()
@@ -332,7 +348,7 @@ pub mod raw {
     }
 
     impl Dummy<Faker> for SymbolicExpression {
-        fn dummy_with_rng<R: Rng + ?Sized>(config: &Faker, rng: &mut R) -> Self {
+        fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
             SymbolicExpression {
                 expr: random_symbolic_expression_type(None, rng),
                 id: rng.gen(),
@@ -349,6 +365,7 @@ pub mod raw {
     }
 }
 
+/// A list of random English words which can be used when generating fake data.
 const ENGLISH_WORDS: &'static [&'static str] = &[
     "glancing",
     "gwaith",
