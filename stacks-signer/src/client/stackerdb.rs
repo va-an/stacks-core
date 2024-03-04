@@ -76,7 +76,7 @@ impl StackerDB {
             signers_message_stackerdb_sessions.insert(
                 msg_id,
                 StackerDBSession::new(
-                    host,
+                    host.to_string(),
                     QualifiedContractIdentifier::new(
                         stackerdb_issuer.into(),
                         ContractName::from(
