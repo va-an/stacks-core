@@ -432,8 +432,8 @@ pub(crate) mod tests {
             "Cannot generate 0 keys for the provided signers...Specify at least 1 key."
         );
         let mut public_keys = PublicKeys {
-            signers: HashMap::new(),
-            key_ids: HashMap::new(),
+            signers: hashbrown::HashMap::new(),
+            key_ids: hashbrown::HashMap::new(),
         };
         let reward_cycle = thread_rng().next_u64();
         let rng = &mut OsRng;

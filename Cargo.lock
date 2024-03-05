@@ -2854,6 +2854,7 @@ name = "relay-server"
 version = "0.0.1"
 dependencies = [
  "hashbrown 0.14.3",
+ "stacks-common",
 ]
 
 [[package]]

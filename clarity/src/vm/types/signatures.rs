@@ -810,7 +810,7 @@ impl TypeSignature {
             ListUnionType(types) => {
                 let mut is_trait = None;
                 let mut is_principal = true;
-                for partial in types.into_iter() {
+                for partial in types.iter() {
                     match partial {
                         CallableSubtype::Principal(_) => {
                             if is_trait.is_some() {
@@ -1344,7 +1344,7 @@ impl TypeSignature {
             | (CallableType(CallableSubtype::Principal(_)), PrincipalType) => Ok(PrincipalType),
             (PrincipalType, ListUnionType(l)) | (ListUnionType(l), PrincipalType) => {
                 let mut all_principals = true;
-                for ty in l.into_iter() {
+                for ty in l.iter() {
                     match ty {
                         CallableSubtype::Trait(_) => {
                             all_principals = false;

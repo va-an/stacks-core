@@ -19,6 +19,10 @@ where
     pub fn new() -> Self {
         StacksHashSet(hashbrown::HashSet::new())
     }
+
+    pub fn with_capacity(capacity: usize) -> Self {
+        StacksHashSet(hashbrown::HashSet::with_capacity(capacity))
+    }
 }
 
 impl<T> Deref for StacksHashSet<T>
@@ -41,6 +45,17 @@ where
     }
 }
 
+impl<T> Iterator for StacksHashSet<T>
+where
+    T: Eq + Hash + Clone,
+{
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.clone().into_iter().next()
+    }
+}
+
 impl<T> FromIterator<T> for StacksHashSet<T>
 where
     T: Eq + Hash,
@@ -51,6 +66,33 @@ where
             set.insert(item);
         }
         set
+    }
+}
+
+impl<T> From<HashSet<T>> for StacksHashSet<T>
+where
+    T: Eq + Hash,
+{
+    fn from(set: HashSet<T>) -> Self {
+        StacksHashSet(set)
+    }
+}
+
+impl<T> From<&HashSet<T>> for StacksHashSet<T>
+where
+    T: Eq + Hash + Clone,
+{
+    fn from(set: &HashSet<T>) -> Self {
+        StacksHashSet(set.clone())
+    }
+}
+
+impl<T> Into<HashSet<T>> for StacksHashSet<T>
+where
+    T: Eq + Hash,
+{
+    fn into(self) -> HashSet<T> {
+        self.0
     }
 }
 

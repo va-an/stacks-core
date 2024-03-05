@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::cell::RefCell;
-use std::collections::{HashSet, VecDeque};
+use std::collections::VecDeque;
 use std::path::{Path, PathBuf};
 use std::{fs, io};
 
@@ -119,7 +119,7 @@ impl Default for TestSigners {
         Self {
             signer_parties,
             aggregate_public_key,
-            poly_commitments,
+            poly_commitments: poly_commitments.into(),
             num_keys,
             threshold,
             party_key_ids,
@@ -179,7 +179,7 @@ impl TestSigners {
             .collect();
         self.poly_commitments =
             match wsts::v2::test_helpers::dkg(&mut self.signer_parties, &mut rng) {
-                Ok(poly_commitments) => poly_commitments,
+                Ok(poly_commitments) => poly_commitments.into(),
                 Err(secret_errors) => {
                     panic!("Got secret errors from DKG: {:?}", secret_errors);
                 }

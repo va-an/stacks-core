@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 // Copyright (C) 2013-2020 Blockstack PBC, a public benefit corporation
 // Copyright (C) 2020-2023 Stacks Open Internet Foundation
 //
@@ -359,7 +358,7 @@ impl BlockMinerThread {
                 _ => {} // Any other message is ignored
             }
         }
-        Ok(filtered_transactions.into_values().collect())
+        Ok(filtered_transactions.iter().map(|(_, v)| v.clone()).collect())
     }
 
     fn wait_for_signer_signature(
@@ -450,7 +449,7 @@ impl BlockMinerThread {
                             rejections_weight = rejections_weight.saturating_add(
                                 *signer_weights
                                     .get(
-                                        &slot_ids_addresses
+                                        slot_ids_addresses
                                             .get(&signer_id)
                                             .expect("FATAL: signer not found in slot ids"),
                                     )

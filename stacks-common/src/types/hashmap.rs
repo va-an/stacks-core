@@ -25,9 +25,41 @@ where
     }
 }
 
-impl Default for StacksHashMap<String, String> {
+impl<K, V> Default for StacksHashMap<K, V> 
+where
+    K: Eq + Hash,
+{
     fn default() -> Self {
-        StacksHashMap(HashMap::new())
+        StacksHashMap(HashMap::<K, V>::new())
+    }
+}
+
+impl<K, V> From<HashMap<K, V>> for StacksHashMap<K, V>
+where
+    K: Eq + Hash,
+{
+    fn from(map: HashMap<K, V>) -> Self {
+        StacksHashMap(map)
+    }
+}   
+
+impl<K, V> From<&HashMap<K, V>> for StacksHashMap<K, V>
+where
+    K: Eq + Hash + Clone,
+    V: Clone,
+{
+    fn from(map: &HashMap<K, V>) -> Self {
+        StacksHashMap(map.clone())
+    }
+}
+
+impl<K, V> Into<HashMap<K, V>> for StacksHashMap<K, V> 
+where
+    K: Eq + Hash + Clone,
+    V: Clone,
+{
+    fn into(self) -> HashMap<K, V> {
+        self.0
     }
 }
 

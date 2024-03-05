@@ -178,8 +178,14 @@ impl From<SignerConfig> for Signer {
             dkg_end_timeout: signer_config.dkg_end_timeout,
             nonce_timeout: signer_config.nonce_timeout,
             sign_timeout: signer_config.sign_timeout,
-            signer_key_ids: signer_config.signer_entries.coordinator_key_ids,
-            signer_public_keys: signer_config.signer_entries.signer_public_keys,
+            signer_key_ids: signer_config.signer_entries.coordinator_key_ids
+                .iter()
+                .map(|(k, v)| (k.clone(), v.clone().into_iter().collect::<hashbrown::HashSet<_>>()))
+                .collect::<hashbrown::HashMap<_, _>>(),
+            signer_public_keys: signer_config.signer_entries.signer_public_keys
+                .iter()
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect::<hashbrown::HashMap<_, _>>()
         };
 
         let coordinator = FireCoordinator::new(coordinator_config);
@@ -213,7 +219,8 @@ impl From<SignerConfig> for Signer {
             signer_addresses: signer_config
                 .signer_entries
                 .signer_ids
-                .into_keys()
+                .iter()
+                .map(|(k, _)| k.clone())
                 .collect(),
             signer_slot_ids: signer_config.signer_slot_ids.clone(),
             next_signer_slot_ids: vec![],
@@ -708,7 +715,7 @@ impl Signer {
     /// Get transactions from stackerdb for the given addresses and account nonces, filtering out any malformed transactions
     fn get_signer_transactions(
         &mut self,
-        nonces: &std::collections::HashMap<StacksAddress, u64>,
+        nonces: &HashMap<StacksAddress, u64>,
     ) -> Result<Vec<StacksTransaction>, ClientError> {
         let transactions: Vec<_> = self
             .stackerdb
@@ -741,7 +748,7 @@ impl Signer {
         let transactions: Vec<_> = self
             .stackerdb
             .get_next_transactions_with_retry(&self.next_signer_slot_ids)?;
-        let mut filtered_transactions = std::collections::HashMap::new();
+        let mut filtered_transactions = HashMap::new();
         NakamotoSigners::update_filtered_transactions(
             &mut filtered_transactions,
             &account_nonces,
@@ -749,7 +756,7 @@ impl Signer {
             transactions,
         );
         // We only allow enforcement of one special cased transaction per signer address per block
-        Ok(filtered_transactions.into_values().collect())
+        Ok(filtered_transactions.iter().map(|(_, v)| v.clone()).collect())
     }
 
     /// Determine the vote for a block and update the block info and nonce request accordingly
@@ -925,8 +932,8 @@ impl Signer {
         &self,
         stacks_client: &StacksClient,
         signer_addresses: &[StacksAddress],
-    ) -> std::collections::HashMap<StacksAddress, u64> {
-        let mut account_nonces = std::collections::HashMap::with_capacity(signer_addresses.len());
+    ) -> HashMap<StacksAddress, u64> {
+        let mut account_nonces = HashMap::with_capacity(signer_addresses.len());
         for address in signer_addresses {
             let Ok(account_nonce) = retry_with_exponential_backoff(|| {
                 stacks_client

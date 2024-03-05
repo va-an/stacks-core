@@ -9,3 +9,4 @@ path = "src/main.rs"
 
 [dependencies]
 hashbrown = { workspace = true }
+stacks_common = { path = "../../../stacks-common", package = "stacks-common" }

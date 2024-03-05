@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+use std::hash::Hash;
 use std::io::{Read, Write};
 use std::net::{SocketAddr, TcpListener, TcpStream};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -299,7 +300,7 @@ impl StacksMessageCodecExtensions for BadPrivateShare {
 impl StacksMessageCodecExtensions for HashSet<u32> {
     fn inner_consensus_serialize<W: Write>(&self, fd: &mut W) -> Result<(), CodecError> {
         write_next(fd, &(self.len() as u32))?;
-        for i in self {
+        for i in self.clone() {
             write_next(fd, &i)?;
         }
         Ok(())
@@ -321,14 +322,17 @@ impl StacksMessageCodecExtensions for DkgFailure {
             DkgFailure::BadState => write_next(fd, &0u8),
             DkgFailure::MissingPublicShares(shares) => {
                 write_next(fd, &1u8)?;
+                let shares: HashSet<u32> = shares.into();
                 shares.inner_consensus_serialize(fd)
             }
             DkgFailure::BadPublicShares(shares) => {
                 write_next(fd, &2u8)?;
+                let shares: HashSet<u32> = shares.into();
                 shares.inner_consensus_serialize(fd)
             }
             DkgFailure::MissingPrivateShares(shares) => {
                 write_next(fd, &3u8)?;
+                let shares: HashSet<u32> = shares.into();
                 shares.inner_consensus_serialize(fd)
             }
             DkgFailure::BadPrivateShares(shares) => {
@@ -348,15 +352,15 @@ impl StacksMessageCodecExtensions for DkgFailure {
             0 => DkgFailure::BadState,
             1 => {
                 let set = HashSet::<u32>::inner_consensus_deserialize(fd)?;
-                DkgFailure::MissingPublicShares(set)
+                DkgFailure::MissingPublicShares(set.into())
             }
             2 => {
                 let set = HashSet::<u32>::inner_consensus_deserialize(fd)?;
-                DkgFailure::BadPublicShares(set)
+                DkgFailure::BadPublicShares(set.into())
             }
             3 => {
                 let set = HashSet::<u32>::inner_consensus_deserialize(fd)?;
-                DkgFailure::MissingPrivateShares(set)
+                DkgFailure::MissingPrivateShares(set.into())
             }
             4 => {
                 let mut map = HashMap::new();
@@ -366,7 +370,7 @@ impl StacksMessageCodecExtensions for DkgFailure {
                     let bad_share = BadPrivateShare::inner_consensus_deserialize(fd)?;
                     map.insert(i, bad_share);
                 }
-                DkgFailure::BadPrivateShares(map)
+                DkgFailure::BadPrivateShares(map.into())
             }
             _ => {
                 return Err(CodecError::DeserializeError(format!(
@@ -541,11 +545,13 @@ impl StacksMessageCodecExtensions for DkgPrivateShares {
             let id = read_next::<u32, _>(fd)?;
             let num_share_map = read_next::<u32, _>(fd)?;
             let mut share_map = HashMap::new();
+            
             for _ in 0..num_share_map {
                 let id = read_next::<u32, _>(fd)?;
                 let share: Vec<u8> = read_next(fd)?;
                 share_map.insert(id, share);
             }
+            let share_map: hashbrown::HashMap<_, _> = share_map.into();
             shares.push((id, share_map));
         }
         Ok(DkgPrivateShares {
@@ -1338,6 +1344,7 @@ mod test {
                 rng.fill(&mut bytes[..]);
                 shares_map.insert(i, bytes.to_vec());
             }
+            let shares_map: hashbrown::HashMap<_, _> = shares_map.into();
             shares.push((i, shares_map));
         }
         test_fixture_packet(Message::DkgPrivateShares(DkgPrivateShares {

@@ -92,8 +92,8 @@ impl RunLoop {
         let mut signer_key_ids = HashMap::with_capacity(signers.len());
         let mut signer_ids = HashMap::with_capacity(signers.len());
         let mut public_keys = PublicKeys {
-            signers: HashMap::with_capacity(signers.len()),
-            key_ids: HashMap::with_capacity(4000),
+            signers: HashMap::with_capacity(signers.len()).into(),
+            key_ids: HashMap::with_capacity(4000).into(),
         };
         let mut signer_public_keys = HashMap::with_capacity(signers.len());
         for (i, entry) in signers.iter().enumerate() {
@@ -213,7 +213,9 @@ impl RunLoop {
             signer_slot_id: *signer_slot_id,
             key_ids,
             signer_entries,
-            signer_slot_ids: signer_slot_ids.into_values().collect(),
+            signer_slot_ids: signer_slot_ids
+                .iter()
+                .map(|(_, v)| v.clone()).collect(),
             ecdsa_private_key: self.config.ecdsa_private_key,
             stacks_private_key: self.config.stacks_private_key,
             node_host: self.config.node_host.to_string(),
@@ -415,7 +417,9 @@ mod tests {
 
         let parsed_entries = RunLoop::parse_nakamoto_signer_entries(&signer_entries, false);
         assert_eq!(parsed_entries.signer_ids.len(), nmb_signers);
-        let mut signer_ids = parsed_entries.signer_ids.into_values().collect::<Vec<_>>();
+        let mut signer_ids = parsed_entries.signer_ids.iter()
+            .map(|(_, v)| v.clone())
+            .collect::<Vec<_>>();
         signer_ids.sort();
         assert_eq!(
             signer_ids,

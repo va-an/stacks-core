@@ -207,8 +207,12 @@ impl From<CostStateSummary> for SerializedCostStateSummary {
             cost_function_references,
         } = other;
         SerializedCostStateSummary {
-            contract_call_circuits: contract_call_circuits.into_iter().collect(),
-            cost_function_references: cost_function_references.into_iter().collect(),
+            contract_call_circuits: contract_call_circuits.iter()
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect(),
+            cost_function_references: cost_function_references.iter()
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect(),
         }
     }
 }

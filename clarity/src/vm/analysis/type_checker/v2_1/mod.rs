@@ -753,7 +753,7 @@ fn clarity2_inner_type_check_type<T: CostTracker>(
             TypeSignature::CallableType(CallableSubtype::Trait(_)),
         ) => {
             // Verify that all types in the union implement this trait
-            for subtype in types.into_iter() {
+            for subtype in types.iter() {
                 clarity2_inner_type_check_type(
                     db,
                     contract_context,
