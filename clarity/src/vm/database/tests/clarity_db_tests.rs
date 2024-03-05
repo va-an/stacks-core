@@ -1,6 +1,10 @@
 use fake::{Fake, Faker};
 use rusqlite::NO_PARAMS;
 use stacks_common::util::hash::Sha512Trunc256Sum;
+#[cfg(test)]
+use proptest::prelude::*;
+#[cfg(test)]
+use clarity_proptest::*;
 
 use crate::vm::contracts::Contract;
 use crate::vm::database::clarity_store::ContractCommitment;
@@ -11,15 +15,16 @@ use crate::vm::database::{
 use crate::vm::fakes::raw::EnglishWord;
 use crate::vm::Value;
 
-#[test]
-fn insert_contract() {
-    for _ in 0..1000 {
+proptest! {
+    #[test]
+    fn insert_contract(contract in contract()) {
         let mut store = MemoryBackingStore::new();
         let mut db = ClarityDatabase::new(&mut store, &NULL_HEADER_DB, &NULL_BURN_STATE_DB);
 
         db.begin();
 
         let contract: Contract = Faker.fake();
+        
         let contract_id = contract.contract_context.contract_identifier.clone();
 
         db.insert_contract(&contract_id, contract)

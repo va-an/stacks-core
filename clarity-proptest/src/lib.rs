@@ -9,6 +9,8 @@ use clarity::vm::types::{
 use clarity::vm::{ClarityName, ContractContext, ContractName};
 use proptest::prelude::*;
 
+mod tests;
+
 pub fn contract() -> impl Strategy<Value = Contract> {
     fn clarity_name() -> impl Strategy<Value = ClarityName> {
         "[a-z]{40}".prop_map(|s| s.try_into().unwrap())

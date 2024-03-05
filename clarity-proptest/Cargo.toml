@@ -12,4 +12,5 @@ path = "src/lib.rs"
 clarity = { path = "../clarity" }
 stacks_common = { path = "../stacks-common", package = "stacks-common" }
 proptest = { version = "1.4" }
+rusqlite = { version = "=0.24.2", features = ["blob", "serde_json", "i128_blob", "bundled", "trace"] }
 

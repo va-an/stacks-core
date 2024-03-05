@@ -729,10 +729,12 @@ name = "clarity"
 version = "0.0.1"
 dependencies = [
  "assert-json-diff",
+ "clarity-proptest",
  "fake",
  "hashbrown 0.14.3",
  "integer-sqrt",
  "lazy_static",
+ "proptest",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
  "regex",
@@ -754,6 +756,7 @@ version = "0.1.0"
 dependencies = [
  "clarity",
  "proptest",
+ "rusqlite",
  "stacks-common",
 ]
 
