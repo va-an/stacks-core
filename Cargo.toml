@@ -10,7 +10,9 @@ members = [
     "contrib/tools/relay-server",
     "libsigner",
     "stacks-signer",
-    "testnet/stacks-node"]
+    "testnet/stacks-node",
+    "clarity-proptest"
+]
 
 # Dependencies we want to keep the same between workspace members
 [workspace.dependencies]  
@@ -22,6 +24,7 @@ rand_chacha = "0.3.1"
 tikv-jemallocator = "0.5.4"
 wsts = { version = "8.1", default-features = false }
 fake = { version = "2.9.2", features = ["derive"] }
+proptest = { version = "1.4.0" }
 
 # Use a bit more than default optimization for
 #  dev builds to speed up test execution
