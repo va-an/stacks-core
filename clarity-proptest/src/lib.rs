@@ -13,6 +13,7 @@ pub fn contract() -> impl Strategy<Value = Contract> {
     fn clarity_name() -> impl Strategy<Value = ClarityName> {
         "[a-z]{40}".prop_map(|s| s.try_into().unwrap())
     }
+    
     (
         // contract_identifier
         qualified_principal().prop_map(|p| match p {

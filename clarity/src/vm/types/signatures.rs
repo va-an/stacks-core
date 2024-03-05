@@ -19,11 +19,11 @@ use std::collections::BTreeMap;
 use std::hash::{Hash, Hasher};
 use std::{cmp, fmt};
 
-// TypeSignatures
-use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use lazy_static::lazy_static;
 use stacks_common::address::c32;
 use stacks_common::types::StacksEpochId;
+// TypeSignatures
+use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use stacks_common::util::hash;
 
 use crate::vm::costs::{cost_functions, runtime_cost, CostOverflowingMath};
@@ -2149,7 +2149,8 @@ mod test {
             CallableSubtype::Principal(QualifiedContractIdentifier::local("foo").unwrap()),
             CallableSubtype::Principal(QualifiedContractIdentifier::local("bar").unwrap()),
         ];
-        let list_union_principals = ListUnionType(callable_principals.to_vec().into_iter().collect());
+        let list_union_principals =
+            ListUnionType(callable_principals.to_vec().into_iter().collect());
 
         let notype_pairs = [
             // NoType with X should result in X

@@ -159,10 +159,7 @@ impl TraitsResolver {
         }
 
         for (trait_reference, expr) in referenced_traits.iter() {
-            if !contract_ast
-                .referenced_traits
-                .contains_key(trait_reference)
-            {
+            if !contract_ast.referenced_traits.contains_key(trait_reference) {
                 let mut err = ParseError::new(ParseErrors::TraitReferenceUnknown(
                     trait_reference.to_string(),
                 ));

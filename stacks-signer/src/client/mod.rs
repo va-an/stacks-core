@@ -139,14 +139,15 @@ pub(crate) mod tests {
     use clarity::vm::costs::ExecutionCost;
     use clarity::vm::types::TupleData;
     use clarity::vm::Value as ClarityValue;
-    use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
     use rand::distributions::Standard;
     use rand::{thread_rng, Rng};
     use rand_core::{OsRng, RngCore};
     use stacks_common::types::chainstate::{
         BlockHeaderHash, ConsensusHash, StacksAddress, StacksPrivateKey, StacksPublicKey,
     };
-    use stacks_common::types::{StacksEpochId, StacksPublicKeyBuffer};
+    use stacks_common::types::{
+        StacksEpochId, StacksHashMap as HashMap, StacksHashSet as HashSet, StacksPublicKeyBuffer,
+    };
     use stacks_common::util::hash::{Hash160, Sha256Sum};
     use wsts::curve::ecdsa;
     use wsts::curve::point::{Compressed, Point};

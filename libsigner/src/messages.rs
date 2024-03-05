@@ -30,13 +30,13 @@ use blockstack_lib::net::api::postblock_proposal::{
 use blockstack_lib::util_lib::boot::boot_code_id;
 use clarity::vm::types::serialization::SerializationError;
 use clarity::vm::types::QualifiedContractIdentifier;
-use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use serde::{Deserialize, Serialize};
 use stacks_common::codec::{
     read_next, read_next_at_most, read_next_exact, write_next, Error as CodecError,
     StacksMessageCodec,
 };
 use stacks_common::consts::SIGNER_SLOTS_PER_USER;
+use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use stacks_common::util::hash::Sha512Trunc256Sum;
 use tiny_http::{
     Method as HttpMethod, Request as HttpRequest, Response as HttpResponse, Server as HttpServer,
@@ -545,7 +545,7 @@ impl StacksMessageCodecExtensions for DkgPrivateShares {
             let id = read_next::<u32, _>(fd)?;
             let num_share_map = read_next::<u32, _>(fd)?;
             let mut share_map = HashMap::new();
-            
+
             for _ in 0..num_share_map {
                 let id = read_next::<u32, _>(fd)?;
                 let share: Vec<u8> = read_next(fd)?;

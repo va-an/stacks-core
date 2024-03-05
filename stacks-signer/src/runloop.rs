@@ -20,10 +20,10 @@ use std::time::Duration;
 use blockstack_lib::chainstate::burn::ConsensusHashExtensions;
 use blockstack_lib::chainstate::stacks::boot::{NakamotoSignerEntry, SIGNERS_NAME};
 use blockstack_lib::util_lib::boot::boot_code_id;
-use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use libsigner::{SignerEvent, SignerRunLoop};
 use slog::{slog_debug, slog_error, slog_info, slog_warn};
 use stacks_common::types::chainstate::{ConsensusHash, StacksAddress, StacksPublicKey};
+use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use stacks_common::{debug, error, info, warn};
 use wsts::curve::ecdsa;
 use wsts::curve::point::{Compressed, Point};
@@ -213,9 +213,7 @@ impl RunLoop {
             signer_slot_id: *signer_slot_id,
             key_ids,
             signer_entries,
-            signer_slot_ids: signer_slot_ids
-                .iter()
-                .map(|(_, v)| v.clone()).collect(),
+            signer_slot_ids: signer_slot_ids.iter().map(|(_, v)| v.clone()).collect(),
             ecdsa_private_key: self.config.ecdsa_private_key,
             stacks_private_key: self.config.stacks_private_key,
             node_host: self.config.node_host.to_string(),
@@ -417,7 +415,9 @@ mod tests {
 
         let parsed_entries = RunLoop::parse_nakamoto_signer_entries(&signer_entries, false);
         assert_eq!(parsed_entries.signer_ids.len(), nmb_signers);
-        let mut signer_ids = parsed_entries.signer_ids.iter()
+        let mut signer_ids = parsed_entries
+            .signer_ids
+            .iter()
             .map(|(_, v)| v.clone())
             .collect::<Vec<_>>();
         signer_ids.sort();

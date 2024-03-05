@@ -28,8 +28,8 @@ pub mod raw {
 
     use fake::locales::EN;
     use fake::{Dummy, Fake, Faker};
-    use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
     use rand::Rng;
+    use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 
     use super::ENGLISH_WORDS;
     use crate::vm::callables::DefinedFunction;

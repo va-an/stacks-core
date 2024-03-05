@@ -22,12 +22,11 @@ use blockstack_lib::chainstate::nakamoto::{NakamotoBlock, NakamotoBlockVote};
 use blockstack_lib::chainstate::stacks::boot::SIGNERS_VOTING_FUNCTION_NAME;
 use blockstack_lib::chainstate::stacks::StacksTransaction;
 use blockstack_lib::net::api::postblock_proposal::BlockValidateResponse;
-use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use libsigner::{BlockRejection, BlockResponse, RejectCode, SignerEvent, SignerMessage};
 use slog::{slog_debug, slog_error, slog_info, slog_warn};
 use stacks_common::codec::{read_next, StacksMessageCodec};
 use stacks_common::types::chainstate::StacksAddress;
-use stacks_common::types::StacksEpochId;
+use stacks_common::types::{StacksEpochId, StacksHashMap as HashMap, StacksHashSet as HashSet};
 use stacks_common::util::hash::Sha512Trunc256Sum;
 use stacks_common::{debug, error, info, warn};
 use wsts::common::{MerkleRoot, Signature};
@@ -178,14 +177,23 @@ impl From<SignerConfig> for Signer {
             dkg_end_timeout: signer_config.dkg_end_timeout,
             nonce_timeout: signer_config.nonce_timeout,
             sign_timeout: signer_config.sign_timeout,
-            signer_key_ids: signer_config.signer_entries.coordinator_key_ids
+            signer_key_ids: signer_config
+                .signer_entries
+                .coordinator_key_ids
                 .iter()
-                .map(|(k, v)| (k.clone(), v.clone().into_iter().collect::<hashbrown::HashSet<_>>()))
+                .map(|(k, v)| {
+                    (
+                        k.clone(),
+                        v.clone().into_iter().collect::<hashbrown::HashSet<_>>(),
+                    )
+                })
                 .collect::<hashbrown::HashMap<_, _>>(),
-            signer_public_keys: signer_config.signer_entries.signer_public_keys
+            signer_public_keys: signer_config
+                .signer_entries
+                .signer_public_keys
                 .iter()
                 .map(|(k, v)| (k.clone(), v.clone()))
-                .collect::<hashbrown::HashMap<_, _>>()
+                .collect::<hashbrown::HashMap<_, _>>(),
         };
 
         let coordinator = FireCoordinator::new(coordinator_config);
@@ -756,7 +764,10 @@ impl Signer {
             transactions,
         );
         // We only allow enforcement of one special cased transaction per signer address per block
-        Ok(filtered_transactions.iter().map(|(_, v)| v.clone()).collect())
+        Ok(filtered_transactions
+            .iter()
+            .map(|(_, v)| v.clone())
+            .collect())
     }
 
     /// Determine the vote for a block and update the block info and nonce request accordingly

@@ -34,7 +34,9 @@ use stacks_common::types::chainstate::{
     BlockHeaderHash, BurnchainHeaderHash, ConsensusHash, StacksAddress, StacksPrivateKey,
     StacksPublicKey, StacksWorkScore, TrieHash, VRFSeed,
 };
-use stacks_common::types::{StacksHashMap as HashMap, Address, PrivateKey, StacksEpoch, StacksEpochId};
+use stacks_common::types::{
+    Address, PrivateKey, StacksEpoch, StacksEpochId, StacksHashMap as HashMap,
+};
 use stacks_common::util::get_epoch_time_secs;
 use stacks_common::util::hash::{hex_bytes, Hash160, MerkleTree, Sha512Trunc256Sum};
 use stacks_common::util::secp256k1::{MessageSignature, Secp256k1PublicKey};
@@ -2722,7 +2724,8 @@ fn filter_one_transaction_per_signer_multiple_addresses() {
             valid_tx_2_address_1,
         ],
     );
-    let txs: Vec<_> = filtered_transactions.iter()
+    let txs: Vec<_> = filtered_transactions
+        .iter()
         .map(|(_, v)| v.clone())
         .collect();
     assert_eq!(txs.len(), 2);
@@ -2816,7 +2819,8 @@ fn filter_one_transaction_per_signer_duplicate_nonces() {
         false,
         txs.clone(),
     );
-    let filtered_txs: Vec<_> = filtered_transactions.iter()
+    let filtered_txs: Vec<_> = filtered_transactions
+        .iter()
         .map(|(_, v)| v.clone())
         .collect();
     txs.sort_by(|a, b| a.txid().cmp(&b.txid()));

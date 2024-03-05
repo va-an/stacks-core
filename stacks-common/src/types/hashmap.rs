@@ -25,7 +25,7 @@ where
     }
 }
 
-impl<K, V> Default for StacksHashMap<K, V> 
+impl<K, V> Default for StacksHashMap<K, V>
 where
     K: Eq + Hash,
 {
@@ -41,7 +41,7 @@ where
     fn from(map: HashMap<K, V>) -> Self {
         StacksHashMap(map)
     }
-}   
+}
 
 impl<K, V> From<&HashMap<K, V>> for StacksHashMap<K, V>
 where
@@ -53,7 +53,7 @@ where
     }
 }
 
-impl<K, V> Into<HashMap<K, V>> for StacksHashMap<K, V> 
+impl<K, V> Into<HashMap<K, V>> for StacksHashMap<K, V>
 where
     K: Eq + Hash + Clone,
     V: Clone,

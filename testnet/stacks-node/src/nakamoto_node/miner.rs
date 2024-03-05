@@ -20,7 +20,6 @@ use std::time::{Duration, Instant};
 use clarity::boot_util::boot_code_id;
 use clarity::vm::clarity::ClarityConnection;
 use clarity::vm::types::{PrincipalData, QualifiedContractIdentifier};
-use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use libsigner::{
     BlockResponse, RejectCode, SignerMessage, SignerSession, StackerDBSession, BLOCK_MSG_ID,
     TRANSACTIONS_MSG_ID,
@@ -42,7 +41,9 @@ use stacks::core::FIRST_BURNCHAIN_CONSENSUS_HASH;
 use stacks::net::stackerdb::StackerDBs;
 use stacks_common::codec::{read_next, StacksMessageCodec};
 use stacks_common::types::chainstate::{StacksAddress, StacksBlockId};
-use stacks_common::types::{PrivateKey, StacksEpochId};
+use stacks_common::types::{
+    PrivateKey, StacksEpochId, StacksHashMap as HashMap, StacksHashSet as HashSet,
+};
 use stacks_common::util::hash::{Hash160, Sha512Trunc256Sum};
 use stacks_common::util::vrf::VRFProof;
 use wsts::curve::point::Point;
@@ -358,7 +359,10 @@ impl BlockMinerThread {
                 _ => {} // Any other message is ignored
             }
         }
-        Ok(filtered_transactions.iter().map(|(_, v)| v.clone()).collect())
+        Ok(filtered_transactions
+            .iter()
+            .map(|(_, v)| v.clone())
+            .collect())
     }
 
     fn wait_for_signer_signature(
