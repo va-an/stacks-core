@@ -2,7 +2,7 @@ use std::hash::Hash;
 use std::iter::{FromIterator, IntoIterator};
 use std::ops::{Deref, DerefMut};
 
-#[cfg(any(test, feature = "testing"))]
+#[cfg(feature = "testing")]
 use fake::{Dummy, Fake, Faker};
 use hashbrown::HashMap;
 use rand::Rng;
@@ -17,6 +17,16 @@ where
     K: Eq + Hash,
 {
     pub fn new() -> Self {
+        StacksHashMap(HashMap::new())
+    }
+
+    pub fn with_capacity(capacity: usize) -> Self {
+        StacksHashMap(HashMap::with_capacity(capacity))
+    }
+}
+
+impl Default for StacksHashMap<String, String> {
+    fn default() -> Self {
         StacksHashMap(HashMap::new())
     }
 }
@@ -54,7 +64,7 @@ where
     }
 }
 
-#[cfg(any(test, feature = "testing"))]
+#[cfg(feature = "testing")]
 impl<K, V> Dummy<Faker> for StacksHashMap<K, V>
 where
     K: Eq + Hash + Dummy<Faker>,

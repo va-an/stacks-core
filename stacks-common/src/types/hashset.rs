@@ -2,12 +2,12 @@ use std::hash::Hash;
 use std::iter::{FromIterator, IntoIterator};
 use std::ops::{Deref, DerefMut};
 
-#[cfg(any(test, feature = "testing"))]
+#[cfg(feature = "testing")]
 use fake::{Dummy, Fake, Faker};
 use hashbrown::HashSet;
 use rand::Rng;
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct StacksHashSet<T>(pub hashbrown::HashSet<T>)
 where
     T: Eq + Hash;
@@ -54,7 +54,7 @@ where
     }
 }
 
-#[cfg(any(test, feature = "testing"))]
+#[cfg(feature = "testing")]
 impl<T> Dummy<Faker> for StacksHashSet<T>
 where
     T: Dummy<Faker> + Eq + Hash,

@@ -32,7 +32,7 @@
 use std::hash::Hash;
 use std::{mem, u32};
 
-use hashbrown::HashMap;
+use crate::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 
 use crate::deps_common::bitcoin::network::serialize::{self, SimpleDecoder, SimpleEncoder};
 use crate::deps_common::bitcoin::util::hash::Sha256dHash;
