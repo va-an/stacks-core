@@ -1,5 +1,4 @@
-use std::hash::Hash;
-use clarity::types::StacksHashMap;
+use clarity::types::{StacksHashMap, StacksHashSet};
 use clarity::vm::contracts::Contract;
 use clarity::vm::types::{
     ASCIIData, BuffData, CharType, ListData, ListTypeData, OptionalData, PrincipalData,
@@ -7,107 +6,75 @@ use clarity::vm::types::{
     StandardPrincipalData, StringSubtype, StringUTF8Length, TupleData, TupleTypeSignature,
     TypeSignature, UTF8Data, Value, MAX_VALUE_SIZE,
 };
-use clarity::vm::{ContractContext, ContractName};
+use clarity::vm::{ClarityName, ContractContext, ContractName};
 use proptest::prelude::*;
-use proptest::sample::SizeRange;
 
-// pub fn contract() -> impl Strategy<Value = Contract> {
-//     (contract_context())
-//         .prop_map(|ctx| Contract { contract_context: ctx })
-//}
-
-// pub struct ContractContext {
-//     pub contract_identifier: QualifiedContractIdentifier,
-//     pub variables: HashMap<ClarityName, Value>,
-//     pub functions: HashMap<ClarityName, DefinedFunction>,
-//     pub defined_traits: HashMap<ClarityName, BTreeMap<ClarityName, FunctionSignature>>,
-//     pub implemented_traits: HashSet<TraitIdentifier>,
-//     // tracks the names of NFTs, FTs, Maps, and Data Vars.
-//     //  used for ensuring that they never are defined twice.
-//     pub persisted_names: HashSet<ClarityName>,
-//     // track metadata for contract defined storage
-//     pub meta_data_map: HashMap<ClarityName, DataMapMetadata>,
-//     pub meta_data_var: HashMap<ClarityName, DataVariableMetadata>,
-//     pub meta_nft: HashMap<ClarityName, NonFungibleTokenMetadata>,
-//     pub meta_ft: HashMap<ClarityName, FungibleTokenMetadata>,
-//     pub data_size: u64,
-//     /// track the clarity version of the contract
-//     clarity_version: ClarityVersion,
-// }
-
-pub fn stacks_hashmap<K: Strategy + Hash + Eq, V: Strategy>(
-    key_strategy: impl Strategy<Value = K>,
-    value_strategy: impl Strategy<Value = V>,
-    size: impl Into<SizeRange>
-) -> impl Strategy<Value = stacks_common::types::StacksHashMap<K, V>> {
-    prop::collection::hash_map(
-        key_strategy,
-        value_strategy,
-        size
+pub fn contract() -> impl Strategy<Value = Contract> {
+    fn clarity_name() -> impl Strategy<Value = ClarityName> {
+        "[a-z]{40}".prop_map(|s| s.try_into().unwrap())
+    }
+    (
+        // contract_identifier
+        qualified_principal().prop_map(|p| match p {
+            Value::Principal(PrincipalData::Contract(qual)) => qual,
+            _ => unreachable!(),
+        }),
+        // variables
+        prop::collection::vec((clarity_name(), PropValue::any().prop_map_into()), 0..8)
+            .prop_map(|v| StacksHashMap(v.into_iter().collect())),
+        // functions
+        Just(StacksHashMap::new()),
+        // defined_traits
+        Just(StacksHashMap::new()),
+        // implemented_traits
+        Just(StacksHashSet::new()),
+        // persisted_names
+        Just(StacksHashSet::new()),
+        // meta_data_map
+        Just(StacksHashMap::new()),
+        // meta_data_var
+        Just(StacksHashMap::new()),
+        // meta_nft
+        Just(StacksHashMap::new()),
+        // meta_ft
+        Just(StacksHashMap::new()),
+        // data_size
+        0u64..64,
+        // clarity_version
+        Just(clarity::vm::ClarityVersion::Clarity2),
     )
-        .prop_map(|map| StacksHashMap(map.into_iter().collect())
-    )
+        .prop_map(
+            |(
+                contract_identifier,
+                variables,
+                functions,
+                defined_traits,
+                implemented_traits,
+                persisted_names,
+                meta_data_map,
+                meta_data_var,
+                meta_nft,
+                meta_ft,
+                data_size,
+                clarity_version,
+            )| {
+                let mut cc = ContractContext::new(contract_identifier, clarity_version);
+                cc.variables = variables;
+                cc.functions = functions;
+                cc.defined_traits = defined_traits;
+                cc.implemented_traits = implemented_traits;
+                cc.persisted_names = persisted_names;
+                cc.meta_data_map = meta_data_map;
+                cc.meta_data_var = meta_data_var;
+                cc.meta_nft = meta_nft;
+                cc.meta_ft = meta_ft;
+                cc.data_size = data_size;
+                Contract {
+                    contract_context: cc,
+                }
+            },
+        )
 }
-
-// pub fn contract_context() -> impl Strategy<Value = ContractContext> {
-//     let x = stacks_hashmap(
-//         "[a-zA-Z]{1,40}".prop_map_into(), 
-//         prop_signature().prop_flat_map(prop_value), 
-//         0..16
-//     );
-
-//     (
-//         qualified_principal(),
-//         stacks_hashmap(
-//             "[a-zA-Z]{1,40}".prop_map_into(), 
-//             prop_signature().prop_flat_map(prop_value), 
-//             0..16
-//         ),
-//         stacks_hashmap("[a-zA-Z]{1,40}", defined_function(), 0..16),
-//         stacks_hashmap("[a-zA-Z]{1,40}", stacks_hashmap(
-//             "[a-zA-Z]{1,40}",
-//             function_signature(),
-//             0..16
-//         ), 0..16),
-//         prop::collection::hash_set(trait_identifier(), 0..16),
-//         prop::collection::hash_set("[a-zA-Z]{1,40}", 0..16),
-//         stacks_hashmap("[a-zA-Z]{1,40}", data_map_metadata(), 0..16),
-//         stacks_hashmap("[a-zA-Z]{1,40}", data_variable_metadata(), 0..16),
-//         stacks_hashmap("[a-zA-Z]{1,40}", non_fungible_token_metadata(), 0..16),
-//         stacks_hashmap("[a-zA-Z]{1,40}", fungible_token_metadata(), 0..16),
-//         0u64..u64::MAX,
-//         clarity_version(),
-//     )
-//         .prop_map(|(
-//             contract_identifier,
-//             variables,
-//             functions,
-//             defined_traits,
-//             implemented_traits,
-//             persisted_names,
-//             meta_data_map,
-//             meta_data_var,
-//             meta_nft,
-//             meta_ft,
-//             data_size,
-//             clarity_version,
-//         )| {
-//             ContractContext {
-//                 contract_identifier,
-//                 variables,
-//                 functions,
-//                 defined_traits,
-//                 implemented_traits,
-//                 persisted_names,
-//                 meta_data_map,
-//                 meta_data_var,
-//                 meta_nft,
-//                 meta_ft,
-//                 data_size,
-//                 clarity_version,
-//             }
-//         })
-// }
 
 pub fn prop_signature() -> impl Strategy<Value = TypeSignature> {
     let leaf = prop_oneof![
