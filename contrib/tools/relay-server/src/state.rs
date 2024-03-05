@@ -1,4 +1,4 @@
-use hashbrown::HashMap;
+use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 
 #[derive(Default)]
 pub struct State {

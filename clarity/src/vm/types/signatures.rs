@@ -20,7 +20,7 @@ use std::hash::{Hash, Hasher};
 use std::{cmp, fmt};
 
 // TypeSignatures
-use hashbrown::HashSet;
+use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use lazy_static::lazy_static;
 use stacks_common::address::c32;
 use stacks_common::types::StacksEpochId;
@@ -810,7 +810,7 @@ impl TypeSignature {
             ListUnionType(types) => {
                 let mut is_trait = None;
                 let mut is_principal = true;
-                for partial in types {
+                for partial in types.into_iter() {
                     match partial {
                         CallableSubtype::Principal(_) => {
                             if is_trait.is_some() {
@@ -1332,7 +1332,7 @@ impl TypeSignature {
                 if x == y {
                     Ok(a.clone())
                 } else {
-                    Ok(ListUnionType(HashSet::from([x.clone(), y.clone()])))
+                    Ok(ListUnionType(HashSet::from_iter([x.clone(), y.clone()])))
                 }
             }
             (ListUnionType(l), CallableType(c)) | (CallableType(c), ListUnionType(l)) => {
@@ -1344,7 +1344,7 @@ impl TypeSignature {
             | (CallableType(CallableSubtype::Principal(_)), PrincipalType) => Ok(PrincipalType),
             (PrincipalType, ListUnionType(l)) | (ListUnionType(l), PrincipalType) => {
                 let mut all_principals = true;
-                for ty in l {
+                for ty in l.into_iter() {
                     match ty {
                         CallableSubtype::Trait(_) => {
                             all_principals = false;
@@ -2133,7 +2133,7 @@ mod test {
                 contract_identifier: QualifiedContractIdentifier::transient(),
             }),
         ];
-        let list_union = ListUnionType(callables.clone().into());
+        let list_union = ListUnionType(callables.to_vec().into_iter().collect());
         let callables2 = [
             CallableSubtype::Principal(QualifiedContractIdentifier::local("bar").unwrap()),
             CallableSubtype::Trait(TraitIdentifier {
@@ -2141,7 +2141,7 @@ mod test {
                 contract_identifier: QualifiedContractIdentifier::transient(),
             }),
         ];
-        let list_union2 = ListUnionType(callables2.clone().into());
+        let list_union2 = ListUnionType(callables2.to_vec().into_iter().collect());
         let list_union_merged = ListUnionType(HashSet::from_iter(
             [callables, callables2].concat().iter().cloned(),
         ));
@@ -2149,7 +2149,7 @@ mod test {
             CallableSubtype::Principal(QualifiedContractIdentifier::local("foo").unwrap()),
             CallableSubtype::Principal(QualifiedContractIdentifier::local("bar").unwrap()),
         ];
-        let list_union_principals = ListUnionType(callable_principals.into());
+        let list_union_principals = ListUnionType(callable_principals.to_vec().into_iter().collect());
 
         let notype_pairs = [
             // NoType with X should result in X

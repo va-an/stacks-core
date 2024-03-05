@@ -17,7 +17,7 @@
 use std::io::{Read, Write};
 use std::{cmp, error, fmt, str};
 
-use hashbrown::HashMap;
+use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use lazy_static::lazy_static;
 use serde_json::Value as JSONValue;
 use stacks_common::codec::{Error as codec_error, StacksMessageCodec};

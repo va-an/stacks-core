@@ -28,7 +28,7 @@ pub mod raw {
 
     use fake::locales::EN;
     use fake::{Dummy, Fake, Faker};
-    use hashbrown::HashMap;
+    use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
     use rand::Rng;
 
     use super::ENGLISH_WORDS;

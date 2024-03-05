@@ -21,7 +21,7 @@ use std::time::{Duration, Instant};
 use clarity::boot_util::boot_code_id;
 use clarity::vm::clarity::ClarityConnection;
 use clarity::vm::types::{PrincipalData, QualifiedContractIdentifier};
-use hashbrown::HashSet;
+use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use libsigner::{
     BlockResponse, RejectCode, SignerMessage, SignerSession, StackerDBSession, BLOCK_MSG_ID,
     TRANSACTIONS_MSG_ID,

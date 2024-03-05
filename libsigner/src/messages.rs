@@ -29,7 +29,7 @@ use blockstack_lib::net::api::postblock_proposal::{
 use blockstack_lib::util_lib::boot::boot_code_id;
 use clarity::vm::types::serialization::SerializationError;
 use clarity::vm::types::QualifiedContractIdentifier;
-use hashbrown::{HashMap, HashSet};
+use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use serde::{Deserialize, Serialize};
 use stacks_common::codec::{
     read_next, read_next_at_most, read_next_exact, write_next, Error as CodecError,
@@ -300,7 +300,7 @@ impl StacksMessageCodecExtensions for HashSet<u32> {
     fn inner_consensus_serialize<W: Write>(&self, fd: &mut W) -> Result<(), CodecError> {
         write_next(fd, &(self.len() as u32))?;
         for i in self {
-            write_next(fd, i)?;
+            write_next(fd, &i)?;
         }
         Ok(())
     }

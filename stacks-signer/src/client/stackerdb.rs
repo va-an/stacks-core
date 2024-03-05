@@ -19,7 +19,7 @@ use blockstack_lib::chainstate::stacks::StacksTransaction;
 use blockstack_lib::util_lib::boot::boot_code_addr;
 use clarity::vm::types::QualifiedContractIdentifier;
 use clarity::vm::ContractName;
-use hashbrown::HashMap;
+use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use libsigner::{SignerMessage, SignerSession, StackerDBSession, TRANSACTIONS_MSG_ID};
 use libstackerdb::{StackerDBChunkAckData, StackerDBChunkData};
 use slog::{slog_debug, slog_warn};

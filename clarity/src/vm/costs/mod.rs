@@ -17,7 +17,7 @@
 use std::collections::BTreeMap;
 use std::{cmp, fmt};
 
-use hashbrown::HashMap;
+use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use lazy_static::lazy_static;
 use rusqlite::types::{FromSql, FromSqlResult, ToSql, ToSqlOutput, ValueRef};
 use serde::{Deserialize, Serialize};

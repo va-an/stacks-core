@@ -20,7 +20,7 @@ use std::time::Duration;
 use blockstack_lib::chainstate::burn::ConsensusHashExtensions;
 use blockstack_lib::chainstate::stacks::boot::{NakamotoSignerEntry, SIGNERS_NAME};
 use blockstack_lib::util_lib::boot::boot_code_id;
-use hashbrown::{HashMap, HashSet};
+use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use libsigner::{SignerEvent, SignerRunLoop};
 use slog::{slog_debug, slog_error, slog_info, slog_warn};
 use stacks_common::types::chainstate::{ConsensusHash, StacksAddress, StacksPublicKey};

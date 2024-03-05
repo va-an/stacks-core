@@ -22,7 +22,7 @@ use blockstack_lib::chainstate::nakamoto::{NakamotoBlock, NakamotoBlockVote};
 use blockstack_lib::chainstate::stacks::boot::SIGNERS_VOTING_FUNCTION_NAME;
 use blockstack_lib::chainstate::stacks::StacksTransaction;
 use blockstack_lib::net::api::postblock_proposal::BlockValidateResponse;
-use hashbrown::{HashMap, HashSet};
+use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
 use libsigner::{BlockRejection, BlockResponse, RejectCode, SignerEvent, SignerMessage};
 use slog::{slog_debug, slog_error, slog_info, slog_warn};
 use stacks_common::codec::{read_next, StacksMessageCodec};

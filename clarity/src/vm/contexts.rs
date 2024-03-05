@@ -18,7 +18,6 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 use std::mem::replace;
 
-//use hashbrown::{HashMap, HashSet};
 use serde::Serialize;
 use serde_json::json;
 use stacks_common::consts::CHAIN_ID_TESTNET;

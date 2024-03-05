@@ -139,7 +139,7 @@ pub(crate) mod tests {
     use clarity::vm::costs::ExecutionCost;
     use clarity::vm::types::TupleData;
     use clarity::vm::Value as ClarityValue;
-    use hashbrown::{HashMap, HashSet};
+    use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
     use rand::distributions::Standard;
     use rand::{thread_rng, Rng};
     use rand_core::{OsRng, RngCore};
