@@ -89,29 +89,28 @@ pub fn function_signature() -> impl Strategy<Value = FunctionSignature> {
 }
 
 pub fn defined_function() -> impl Strategy<Value = DefinedFunction> {
-    let x: usize = (0..3).sample_single(&mut rand::thread_rng());
-
     (
         // identifier
         function_identifier(),
         // name
         clarity_name(),
-        // arg_types
-        prop::collection::vec(type_signature(), x..=x),
+        // arg_types + arguments, which must have the same length
+        (0usize..3usize).prop_flat_map(|x| (
+            prop::collection::vec(type_signature(), x..=x),
+            prop::collection::vec(clarity_name(), x..=x)
+        )),
         // define_type
         define_type(),
-        // arguments
-        prop::collection::vec(clarity_name(), x..=x),
         // body
         symbolic_expression(),
     )
-    .prop_map(|(identifier, name, arg_types, define_type, arguments, body)| 
+    .prop_map(|(identifier, name, args, define_type, body)| 
         DefinedFunction {
             identifier,
             name,
-            arg_types,
+            arg_types: args.0,
             define_type,
-            arguments,
+            arguments: args.1,
             body
         }
     )
