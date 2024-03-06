@@ -151,7 +151,6 @@ pub enum StringSubtype {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Hash)]
-#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub enum CallableSubtype {
     Principal(QualifiedContractIdentifier),
     Trait(TraitIdentifier),
@@ -245,7 +244,6 @@ pub enum FunctionArgSignature {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub enum FunctionReturnsSignature {
     TypeOfArgAtPosition(usize),
     Fixed(TypeSignature),

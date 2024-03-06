@@ -84,7 +84,6 @@ impl StandardPrincipalData {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
-#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub struct QualifiedContractIdentifier {
     pub issuer: StandardPrincipalData,
     pub name: ContractName,
@@ -131,7 +130,6 @@ impl fmt::Display for QualifiedContractIdentifier {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize)]
-#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub enum PrincipalData {
     Standard(StandardPrincipalData),
     Contract(QualifiedContractIdentifier),
@@ -154,14 +152,12 @@ pub struct ResponseData {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub struct CallableData {
     pub contract_identifier: QualifiedContractIdentifier,
     pub trait_identifier: Option<TraitIdentifier>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
-#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub struct TraitIdentifier {
     pub name: ClarityName,
     pub contract_identifier: QualifiedContractIdentifier,

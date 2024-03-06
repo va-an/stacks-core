@@ -26,7 +26,6 @@ use crate::vm::version::ClarityVersion;
 use crate::vm::{apply, eval_all, Value};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
-#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub struct Contract {
     pub contract_context: ContractContext,
 }

@@ -74,7 +74,6 @@ macro_rules! clarity_serializable {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub struct FungibleTokenMetadata {
     pub total_supply: Option<u128>,
 }
@@ -82,7 +81,6 @@ pub struct FungibleTokenMetadata {
 clarity_serializable!(FungibleTokenMetadata);
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub struct NonFungibleTokenMetadata {
     pub key_type: TypeSignature,
 }
@@ -90,7 +88,6 @@ pub struct NonFungibleTokenMetadata {
 clarity_serializable!(NonFungibleTokenMetadata);
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub struct DataMapMetadata {
     pub key_type: TypeSignature,
     pub value_type: TypeSignature,
@@ -99,7 +96,6 @@ pub struct DataMapMetadata {
 clarity_serializable!(DataMapMetadata);
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub struct DataVariableMetadata {
     pub value_type: TypeSignature,
 }

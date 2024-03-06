@@ -56,7 +56,6 @@ pub enum CallableType {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub enum DefineType {
     ReadOnly,
     Public,
@@ -121,7 +120,6 @@ pub fn cost_input_sized_vararg(args: &[Value]) -> Result<u64> {
 }
 
 #[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
-#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub struct FunctionIdentifier {
     identifier: String,
 }
@@ -393,14 +391,14 @@ impl CallableType {
 }
 
 impl FunctionIdentifier {
-    fn new_native_function(name: &str) -> FunctionIdentifier {
+    pub fn new_native_function(name: &str) -> FunctionIdentifier {
         let identifier = format!("_native_:{}", name);
         FunctionIdentifier {
             identifier: identifier,
         }
     }
 
-    fn new_user_function(name: &str, context: &str) -> FunctionIdentifier {
+    pub fn new_user_function(name: &str, context: &str) -> FunctionIdentifier {
         let identifier = format!("{}:{}", context, name);
         FunctionIdentifier {
             identifier: identifier,

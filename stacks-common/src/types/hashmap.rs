@@ -2,8 +2,6 @@ use std::hash::Hash;
 use std::iter::{FromIterator, IntoIterator};
 use std::ops::{Deref, DerefMut};
 
-#[cfg(feature = "testing")]
-use fake::{Dummy, Fake, Faker};
 use hashbrown::HashMap;
 use rand::Rng;
 
@@ -93,20 +91,5 @@ where
             map.insert(key, value);
         }
         map
-    }
-}
-
-#[cfg(feature = "testing")]
-impl<K, V> Dummy<Faker> for StacksHashMap<K, V>
-where
-    K: Eq + Hash + Dummy<Faker>,
-    V: Dummy<Faker>,
-{
-    fn dummy_with_rng<R: Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
-        let mut map = HashMap::<K, V>::new();
-        for _ in 0..rng.gen_range(1..5) {
-            map.insert(Faker.fake(), Faker.fake());
-        }
-        StacksHashMap(map)
     }
 }

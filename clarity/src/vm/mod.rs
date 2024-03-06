@@ -47,9 +47,6 @@ pub mod tests;
 #[cfg(any(test, feature = "testing"))]
 pub mod test_util;
 
-#[cfg(feature = "testing")]
-pub mod fakes;
-
 pub mod clarity;
 
 use std::collections::BTreeMap;

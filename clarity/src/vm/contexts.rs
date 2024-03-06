@@ -205,7 +205,6 @@ pub struct GlobalContext<'a, 'hooks> {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
-#[cfg_attr(feature = "testing", derive(fake::Dummy))]
 pub struct ContractContext {
     pub contract_identifier: QualifiedContractIdentifier,
     pub variables: HashMap<ClarityName, Value>,

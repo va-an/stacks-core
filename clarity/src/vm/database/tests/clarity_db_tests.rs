@@ -1,10 +1,8 @@
-use fake::{Fake, Faker};
 use rusqlite::NO_PARAMS;
+use stacks_common::proptesting::sha_512_trunc_256_sum;
 use stacks_common::util::hash::Sha512Trunc256Sum;
-#[cfg(test)]
 use proptest::prelude::*;
-#[cfg(test)]
-use clarity_proptest::*;
+use crate::proptesting::*;
 
 use crate::vm::contracts::Contract;
 use crate::vm::database::clarity_store::ContractCommitment;
@@ -12,7 +10,6 @@ use crate::vm::database::{
     ClarityBackingStore, ClarityDatabase, ClaritySerializable, MemoryBackingStore,
     NULL_BURN_STATE_DB, NULL_HEADER_DB,
 };
-use crate::vm::fakes::raw::EnglishWord;
 use crate::vm::Value;
 
 proptest! {
@@ -22,8 +19,6 @@ proptest! {
         let mut db = ClarityDatabase::new(&mut store, &NULL_HEADER_DB, &NULL_BURN_STATE_DB);
 
         db.begin();
-
-        let contract: Contract = Faker.fake();
         
         let contract_id = contract.contract_context.contract_identifier.clone();
 
@@ -39,17 +34,14 @@ proptest! {
         );
         assert!(!exists);
     }
-}
 
-#[test]
-fn get_contract() {
-    for _ in 0..1000 {
+    #[test]
+    fn get_contract(contract in contract()) {
         let mut store = MemoryBackingStore::new();
         let mut db = ClarityDatabase::new(&mut store, &NULL_HEADER_DB, &NULL_BURN_STATE_DB);
 
         db.begin();
 
-        let contract: Contract = Faker.fake();
         let contract_id = contract.contract_context.contract_identifier.clone();
 
         db.insert_contract(&contract_id, contract.clone())
@@ -61,31 +53,25 @@ fn get_contract() {
 
         assert_eq!(contract, retrieved_contract);
     }
-}
 
-#[test]
-fn insert_contract_without_begin_should_fail() {
-    for _ in 0..1000 {
+    #[test]
+    fn insert_contract_without_begin_should_fail(contract in contract()) {
         let mut store = MemoryBackingStore::new();
         let mut db = ClarityDatabase::new(&mut store, &NULL_HEADER_DB, &NULL_BURN_STATE_DB);
 
-        let contract: Contract = Faker.fake();
         let contract_id = contract.contract_context.contract_identifier.clone();
 
         db.insert_contract(&contract_id, contract)
             .expect_err("inserting contract without a begin should fail");
     }
-}
 
-#[test]
-fn insert_contract_with_commit_should_exist_in_backing_store() {
-    for _ in 0..1000 {
+    #[test]
+    fn insert_contract_with_commit_should_exist_in_backing_store(contract in contract()) {
         let mut store = MemoryBackingStore::new();
         let mut db = ClarityDatabase::new(&mut store, &NULL_HEADER_DB, &NULL_BURN_STATE_DB);
 
         db.begin();
 
-        let contract: Contract = Faker.fake();
         let contract_id = contract.contract_context.contract_identifier.clone();
 
         db.insert_contract(&contract_id, contract.clone())
@@ -106,18 +92,16 @@ fn insert_contract_with_commit_should_exist_in_backing_store() {
 
         assert_eq!(1, count);
     }
-}
 
-#[test]
-fn put_data_no_commit() {
-    for _ in 0..1000 {
+    #[test]
+    fn put_data_no_commit(key in any::<String>()) {
         let mut store = MemoryBackingStore::new();
         let mut db = ClarityDatabase::new(&mut store, &NULL_HEADER_DB, &NULL_BURN_STATE_DB);
 
         db.begin();
 
         db.put(
-            "hello",
+            &key,
             &ContractCommitment {
                 block_height: 1,
                 hash: Sha512Trunc256Sum::from_data(&[1, 2, 3, 4]),
@@ -128,22 +112,23 @@ fn put_data_no_commit() {
         let count = sql_query_u32(&mut store, "SELECT COUNT(*) FROM data_table");
         assert_eq!(0, count);
     }
-}
 
-#[test]
-fn put_data_with_commit_should_exist_in_backing_store() {
-    for _ in 0..1000 {
+    #[test]
+    fn put_data_with_commit_should_exist_in_backing_store(
+        key in any::<String>(),
+        block_height in any::<u32>(),
+        hash in sha_512_trunc_256_sum()
+    ) {
         let mut store = MemoryBackingStore::new();
         let mut db = ClarityDatabase::new(&mut store, &NULL_HEADER_DB, &NULL_BURN_STATE_DB);
 
         db.begin();
 
-        let key = Faker.fake::<String>();
         db.put(
             &key,
             &ContractCommitment {
-                block_height: Faker.fake(),
-                hash: Sha512Trunc256Sum::from_data(&Faker.fake::<Vec<u8>>()),
+                block_height,
+                hash,
             },
         )
         .expect("failed to put data");
@@ -156,25 +141,32 @@ fn put_data_with_commit_should_exist_in_backing_store() {
         );
         assert_eq!(1, count);
     }
-}
 
-#[test]
-fn put_data_without_begin_fails() {
-    for _ in 0..1000 {
+    #[test]
+    fn put_data_without_begin_fails(
+        key in any::<String>(),
+        block_height in any::<u32>(),
+        hash in sha_512_trunc_256_sum()
+    ) {
         let mut store = MemoryBackingStore::new();
         let mut db = ClarityDatabase::new(&mut store, &NULL_HEADER_DB, &NULL_BURN_STATE_DB);
 
-        let key = Faker.fake::<String>();
         db.put(
             &key,
             &ContractCommitment {
-                block_height: Faker.fake(),
-                hash: Sha512Trunc256Sum::from_data(&Faker.fake::<Vec<u8>>()),
+                block_height,
+                hash,
             },
         )
         .expect_err("expected not-nested error");
     }
 }
+
+
+
+
+
+
 
 /// Executes the provided SQL query, which is expected to return a positive
 /// integer, and returns it as a u32. Panics upon SQL failure.

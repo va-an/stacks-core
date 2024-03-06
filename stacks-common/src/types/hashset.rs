@@ -2,8 +2,6 @@ use std::hash::Hash;
 use std::iter::{FromIterator, IntoIterator};
 use std::ops::{Deref, DerefMut};
 
-#[cfg(feature = "testing")]
-use fake::{Dummy, Fake, Faker};
 use hashbrown::HashSet;
 use rand::Rng;
 
@@ -93,20 +91,5 @@ where
 {
     fn into(self) -> HashSet<T> {
         self.0
-    }
-}
-
-#[cfg(feature = "testing")]
-impl<T> Dummy<Faker> for StacksHashSet<T>
-where
-    T: Dummy<Faker> + Eq + Hash,
-{
-    fn dummy_with_rng<R: Rng + ?Sized>(config: &Faker, rng: &mut R) -> Self {
-        let len = rng.gen_range(1..5);
-        let mut set = StacksHashSet::new();
-        for _ in 0..len {
-            set.insert(T::dummy_with_rng(&config, rng));
-        }
-        set
     }
 }

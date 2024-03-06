@@ -729,8 +729,7 @@ name = "clarity"
 version = "0.0.1"
 dependencies = [
  "assert-json-diff",
- "clarity-proptest",
- "fake",
+ "clarity",
  "hashbrown 0.14.3",
  "integer-sqrt",
  "lazy_static",
@@ -748,16 +747,6 @@ dependencies = [
  "slog",
  "stacks-common",
  "time 0.2.27",
-]
-
-[[package]]
-name = "clarity-proptest"
-version = "0.1.0"
-dependencies = [
- "clarity",
- "proptest",
- "rusqlite",
- "stacks-common",
 ]
 
 [[package]]
@@ -3528,12 +3517,12 @@ dependencies = [
  "chrono",
  "curve25519-dalek 2.0.0",
  "ed25519-dalek",
- "fake",
  "hashbrown 0.14.3",
  "lazy_static",
  "libc",
  "nix",
  "percent-encoding",
+ "proptest",
  "rand 0.8.5",
  "rand_core 0.6.4",
  "ripemd",
