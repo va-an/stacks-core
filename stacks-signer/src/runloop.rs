@@ -415,9 +415,7 @@ mod tests {
 
         let parsed_entries = RunLoop::parse_nakamoto_signer_entries(&signer_entries, false);
         assert_eq!(parsed_entries.signer_ids.len(), nmb_signers);
-         let mut signer_ids = parsed_entries
-             .signer_ids
-             .into_values().collect::<Vec<_>>();
+        let mut signer_ids = parsed_entries.signer_ids.into_values().collect::<Vec<_>>();
         signer_ids.sort();
         assert_eq!(
             signer_ids,

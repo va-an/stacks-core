@@ -903,7 +903,7 @@ impl Signer {
                     epoch,
                     signer_transactions,
                     new_transaction,
-                ) { 
+                ) {
                     warn!(
                         "Signer #{}: Failed to broadcast DKG public key vote ({dkg_public_key:?}): {e:?}",
                         self.signer_id

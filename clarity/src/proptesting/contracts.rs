@@ -16,13 +16,13 @@ pub fn contract_context(clarity_version: ClarityVersion) -> impl Strategy<Value 
             _ => unreachable!(),
         }),
         // variables
-        prop::collection::vec((clarity_name(), PropValue::any().prop_map_into()), 0..8)
-            .prop_map(|v| {
+        prop::collection::vec((clarity_name(), PropValue::any().prop_map_into()), 0..8).prop_map(
+            |v| {
                 v.into_iter()
                     .map(|(k, v)| (k, v))
                     .collect::<HashMap<_, _>>()
-            
-            }),
+            },
+        ),
         // functions
         stacks_hash_map(clarity_name(), defined_function(), 1..5),
         // defined_traits
