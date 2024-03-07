@@ -4,6 +4,8 @@ use crate::vm::{types::{BuffData, CharType, ListData, ListTypeData, OptionalData
 
 use super::*;
 
+/// Returns a [`Strategy`] for generating a randomized [`Value`] instance of a
+/// the specified ([`TypeSignature`]).
 pub fn value(ty: TypeSignature) -> impl Strategy<Value = Value> {
     match ty {
         TypeSignature::NoType => unreachable!(),
@@ -35,18 +37,26 @@ pub fn value(ty: TypeSignature) -> impl Strategy<Value = Value> {
     }
 }
 
+/// Returns a [`Strategy`] for generating a randomized [`Value`] instance of variant
+/// [`Value::Int`].
 pub fn int() -> impl Strategy<Value = Value> {
     any::<i128>().prop_map(Value::Int)
 }
 
+/// Returns a [`Strategy`] for generating a randomized [`Value`] instance of variant
+/// [`Value::UInt`].
 pub fn uint() -> impl Strategy<Value = Value> {
     any::<u128>().prop_map(Value::UInt)
 }
 
+/// Returns a [`Strategy`] for generating a randomized [`Value`] instance of variant
+/// [`Value::Bool`].
 pub fn bool() -> impl Strategy<Value = Value> {
     any::<bool>().prop_map(Value::Bool)
 }
 
+/// Returns a [`Strategy`] for generating a randomized [`Value`] instance of variant
+/// [`Value::None`].
 pub fn string_ascii(size: u32) -> impl Strategy<Value = Value> {
     let size = size as usize;
     prop::collection::vec(0x20u8..0x7e, size..=size).prop_map(|bytes| {
@@ -56,6 +66,8 @@ pub fn string_ascii(size: u32) -> impl Strategy<Value = Value> {
     })
 }
 
+/// Returns a [`Strategy`] for generating a randomized [`Value`] instance of variant
+/// [`Value::Sequence`] with an inner type of [`UTF8Data`].
 pub fn string_utf8(size: u32) -> impl Strategy<Value = Value> {
     prop::collection::vec(any::<char>(), size as usize).prop_map(|chars| {
         let mut data = Vec::with_capacity(chars.len());
@@ -68,12 +80,16 @@ pub fn string_utf8(size: u32) -> impl Strategy<Value = Value> {
     })
 }
 
+/// Returns a [`Strategy`] for generating a randomized [`Value`] instance of variant
+/// [`Value::Sequence`] with an inner type of [`BuffData`].
 pub fn buffer(size: u32) -> impl Strategy<Value = Value> {
     let size = size as usize;
     prop::collection::vec(any::<u8>(), size..=size)
         .prop_map(|bytes| Value::Sequence(SequenceData::Buffer(BuffData { data: bytes })))
 }
 
+/// Returns a [`Strategy`] for generating a randomized [`Value`] instance of variant
+/// [`Value::Optional`], with the inner type being the specified [`TypeSignature`].
 pub fn optional(inner_ty: TypeSignature) -> impl Strategy<Value = Value> {
     match inner_ty {
         TypeSignature::NoType => Just(Value::none()).boxed(),
@@ -87,6 +103,8 @@ pub fn optional(inner_ty: TypeSignature) -> impl Strategy<Value = Value> {
     }
 }
 
+/// Returns a [`Strategy`] for generating a randomized [`Value`] instance of variant
+/// [`Value::Response`], with the ok/err types being the specified [`TypeSignature`]s.
 pub fn response(ok_ty: TypeSignature, err_ty: TypeSignature) -> impl Strategy<Value = Value> {
     match (ok_ty, err_ty) {
         (TypeSignature::NoType, err_ty) => value(err_ty)
@@ -116,6 +134,9 @@ pub fn response(ok_ty: TypeSignature, err_ty: TypeSignature) -> impl Strategy<Va
     }
 }
 
+/// Returns a [`Strategy`] for generating a randomized [`Value`] instance of variant
+/// [`Value::Sequence`] with the inner type being a list ([`SequenceData`]) of 
+/// the specified [`ListTypeData`].
 pub fn list(list_type_data: ListTypeData) -> impl Strategy<Value = Value> {
     prop::collection::vec(
         value(list_type_data.get_list_item_type().clone()),

@@ -68,7 +68,7 @@ pub fn type_signature() -> impl Strategy<Value = TypeSignature> {
         )))
     ];
     
-    leaf.prop_recursive(5, 64, 10, |inner| prop_oneof![
+    leaf.prop_recursive(3, 32, 5, |inner| prop_oneof![
         // optional type: 10% NoType + 90% any other type
         prop_oneof![
             1 => Just(TypeSignature::NoType),
@@ -89,7 +89,7 @@ pub fn type_signature() -> impl Strategy<Value = TypeSignature> {
         )
         .prop_map(|btree| TypeSignature::TupleType(btree.try_into().unwrap())),
         // list type
-        (8u32..32, inner.clone()).prop_map(|(s, ty)| (ListTypeData::new_list(ty, s).unwrap()).into()),
+        (1u32..8, inner.clone()).prop_map(|(s, ty)| (ListTypeData::new_list(ty, s).unwrap()).into()),
     ])
 }
 

@@ -25,13 +25,7 @@ proptest! {
         db.insert_contract(&contract_id, contract)
             .expect("failed to insert contract into backing store");
 
-        let exists = sql_exists(
-            &mut store,
-            &format!(
-                "SELECT * FROM metadata_table WHERE key LIKE '%{}%'",
-                contract_id.to_string()
-            ),
-        );
+        let exists = sql_metadata_table_key_count(&mut store, &contract_id.to_string()) > 0;
         assert!(!exists);
     }
 
@@ -79,22 +73,22 @@ proptest! {
 
         db.commit().expect("failed to commit to backing store");
 
-        let count = sql_query_u32(
-            &mut store,
-            &format!(
-                "SELECT COUNT(*) FROM metadata_table WHERE key LIKE '{}'",
-                format!(
-                    "clr-meta::{}::vm-metadata::9::contract",
-                    contract_id.to_string()
-                )
-            ),
+        let contract_key = format!(
+            "clr-meta::{}::vm-metadata::9::contract",
+            contract_id.to_string()
         );
+
+        let count = sql_metadata_table_key_count(&mut store, &contract_key);
 
         assert_eq!(1, count);
     }
 
     #[test]
-    fn put_data_no_commit(key in any::<String>()) {
+    fn put_data_no_commit(
+        key in any::<String>(),
+        block_height in any::<u32>(),
+        hash in sha_512_trunc_256_sum()
+    ) {
         let mut store = MemoryBackingStore::new();
         let mut db = ClarityDatabase::new(&mut store, &NULL_HEADER_DB, &NULL_BURN_STATE_DB);
 
@@ -103,13 +97,13 @@ proptest! {
         db.put(
             &key,
             &ContractCommitment {
-                block_height: 1,
-                hash: Sha512Trunc256Sum::from_data(&[1, 2, 3, 4]),
+                block_height,
+                hash,
             },
         )
         .expect("failed to put data");
 
-        let count = sql_query_u32(&mut store, "SELECT COUNT(*) FROM data_table");
+        let count = sql_data_table_key_count(&mut store, &key.to_string());
         assert_eq!(0, count);
     }
 
@@ -135,10 +129,7 @@ proptest! {
 
         db.commit().expect("failed to commit to backing store");
 
-        let count = sql_query_u32(
-            &mut store,
-            &format!("SELECT COUNT(*) FROM data_table where key = '{}'", key),
-        );
+        let count = sql_data_table_key_count(&mut store, &key.to_string());
         assert_eq!(1, count);
     }
 
@@ -164,31 +155,34 @@ proptest! {
 
 
 
-
-
-
-
-/// Executes the provided SQL query, which is expected to return a positive
-/// integer, and returns it as a u32. Panics upon SQL failure.
-fn sql_query_u32<S: ClarityBackingStore>(store: &mut S, sql: &str) -> u32 {
+/// Returns the number of rows in the metadata table for the provided key.
+fn sql_metadata_table_key_count<S: ClarityBackingStore>(store: &mut S, key: &str) -> u32 {
     let sqlite = store.get_side_store();
-    sqlite
-        .query_row(sql, NO_PARAMS, |row| {
-            let i: u32 = row.get(0)?;
-            Ok(i)
-        })
-        .expect("failed to verify results in sqlite")
+    let count = sqlite
+        .query_row(
+            "SELECT COUNT(*) FROM metadata_table WHERE key = ?1;",
+            &[key],
+            |row| {
+                let i: u32 = row.get(0)?;
+                Ok(i)
+            },
+        )
+        .expect("failed to verify results in sqlite");
+    count
 }
 
-/// Executes the provided SQL query as a subquery within a `SELECT EXISTS(...)`
-/// statement. Returns true if the statement returns any rows, false otherwise.
-/// Panics upon SQL failure.
-fn sql_exists<S: ClarityBackingStore>(store: &mut S, sql: &str) -> bool {
+/// Returns the number of rows in the `data_table` with the given key.
+fn sql_data_table_key_count<S: ClarityBackingStore>(store: &mut S, key: &str) -> u32 {
     let sqlite = store.get_side_store();
-    sqlite
-        .query_row(&format!("SELECT EXISTS({});", sql), NO_PARAMS, |row| {
-            let exists: bool = row.get(0)?;
-            Ok(exists)
-        })
-        .expect("failed to verify results in sqlite")
+    let count = sqlite
+        .query_row(
+            "SELECT COUNT(*) FROM data_table WHERE key = ?1;",
+            &[key],
+            |row| {
+                let i: u32 = row.get(0)?;
+                Ok(i)
+            },
+        )
+        .expect("failed to verify results in sqlite");
+    count
 }

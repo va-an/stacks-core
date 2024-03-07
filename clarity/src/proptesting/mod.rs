@@ -14,7 +14,10 @@ pub use callables::*;
 pub use representations::*;
 pub use contracts::*;
 
-pub fn clarity_version() -> impl Strategy<Value = crate::vm::ClarityVersion> {
+use crate::vm::ClarityVersion;
+
+/// Returns a [`Strategy`] for randomly generating a [`ClarityVersion`] instance.
+pub fn clarity_version() -> impl Strategy<Value = ClarityVersion> {
     prop_oneof![
         Just(crate::vm::ClarityVersion::Clarity1),
         Just(crate::vm::ClarityVersion::Clarity2),

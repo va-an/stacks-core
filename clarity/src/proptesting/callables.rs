@@ -6,6 +6,8 @@ use crate::vm::{callables::{DefineType, DefinedFunction, FunctionIdentifier}, da
 
 use super::*;
 
+/// Returns a [`Strategy`] for randomly generating a [`FunctionIdentifier`] instance
+/// representing a user-defined function.
 pub fn function_identifier_user() -> impl Strategy<Value = FunctionIdentifier> {
     (
         clarity_name(),
@@ -16,6 +18,8 @@ pub fn function_identifier_user() -> impl Strategy<Value = FunctionIdentifier> {
     )
 }
 
+/// Returns a [`Strategy`] for randomly generating a [`FunctionIdentifier`] instance
+/// representing a native function.
 pub fn function_identifier_native() -> impl Strategy<Value = FunctionIdentifier> {
     (
         clarity_name()
@@ -25,6 +29,8 @@ pub fn function_identifier_native() -> impl Strategy<Value = FunctionIdentifier>
     )
 }
 
+/// Returns a [`Strategy`] for randomly generating a [`FunctionIdentifier`]
+/// instance representing a function of any kind, user-defined or native.
 pub fn function_identifier() -> impl Strategy<Value = FunctionIdentifier> {
     prop_oneof![
         function_identifier_user(),
@@ -32,6 +38,7 @@ pub fn function_identifier() -> impl Strategy<Value = FunctionIdentifier> {
     ]
 }
 
+/// Returns a [`Strategy`] for randomly generating a [`DefineType`] variant.
 pub fn define_type() -> impl Strategy<Value = DefineType> {
     prop_oneof![
         Just(DefineType::Public),
@@ -40,6 +47,8 @@ pub fn define_type() -> impl Strategy<Value = DefineType> {
     ]
 }
 
+/// Returns a [`Strategy`] for randomly generating a [`DataVariableMetadata`]
+/// instance.
 pub fn data_variable_metadata() -> impl Strategy<Value = DataVariableMetadata> {
     type_signature()
         .prop_map(|value_type| 
@@ -48,6 +57,7 @@ pub fn data_variable_metadata() -> impl Strategy<Value = DataVariableMetadata> {
 
 }
 
+/// Returns a [`Strategy`] for randomly generating a [`DataMapMetadata`] instance.
 pub fn data_map_metadata() -> impl Strategy<Value = DataMapMetadata> {
     (
         type_signature(),
@@ -61,18 +71,24 @@ pub fn data_map_metadata() -> impl Strategy<Value = DataMapMetadata> {
     )
 }
 
+/// Returns a [`Strategy`] for randomly generating a [`NonFungibleTokenMetadata`] 
+/// instance.
 pub fn nft_metadata() -> impl Strategy<Value = NonFungibleTokenMetadata> {
     type_signature().prop_map(|key_type| 
         NonFungibleTokenMetadata { key_type }
     )
 }
 
+/// Returns a [`Strategy`] for randomly generating a [`FungibleTokenMetadata`] 
+/// instance.
 pub fn ft_metadata() -> impl Strategy<Value = FungibleTokenMetadata> {
     any::<Option<u128>>().prop_map(|total_supply| 
         FungibleTokenMetadata { total_supply }
     )
 }
 
+/// Returns a [`Strategy`] for randomly generating a [`FunctionSignature`] 
+/// instance.
 pub fn function_signature() -> impl Strategy<Value = FunctionSignature> {
     (
         // arg_types
@@ -88,6 +104,8 @@ pub fn function_signature() -> impl Strategy<Value = FunctionSignature> {
     )
 }
 
+/// Returns a [`Strategy`] for randomly generating a [`DefinedFunction`]
+/// instance.
 pub fn defined_function() -> impl Strategy<Value = DefinedFunction> {
     (
         // identifier
