@@ -238,8 +238,10 @@ impl PropValue {
             1 => buffer(size as u32),
             // 10% chance for a string-ascii
             1 => string_ascii(size as u32),
-            // 80% chance for a list
-            8 => any_list
+            // 10% change for a string-utf8
+            1 => string_utf8(size as u32),
+            // 70% chance for a list
+            7 => any_list
         ]
         .prop_map_into()
     }

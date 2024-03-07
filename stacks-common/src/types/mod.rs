@@ -13,12 +13,10 @@ use crate::util::hash::Hash160;
 use crate::util::secp256k1::{MessageSignature, Secp256k1PublicKey};
 
 pub mod chainstate;
-pub mod hashmap;
-pub mod hashset;
 pub mod net;
 
-pub use hashmap::StacksHashMap;
-pub use hashset::StacksHashSet;
+pub type StacksHashMap<K, V> = hashbrown::HashMap<K, V>;
+pub type StacksHashSet<T> = hashbrown::HashSet<T>;
 
 /// A container for public keys (compressed secp256k1 public keys)
 pub struct StacksPublicKeyBuffer(pub [u8; 33]);

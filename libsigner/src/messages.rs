@@ -300,8 +300,8 @@ impl StacksMessageCodecExtensions for BadPrivateShare {
 impl StacksMessageCodecExtensions for HashSet<u32> {
     fn inner_consensus_serialize<W: Write>(&self, fd: &mut W) -> Result<(), CodecError> {
         write_next(fd, &(self.len() as u32))?;
-        for i in self {
-            write_next(fd, &i)?;
+        for i in self.iter() {
+            write_next(fd, i)?;
         }
         Ok(())
     }
@@ -322,17 +322,14 @@ impl StacksMessageCodecExtensions for DkgFailure {
             DkgFailure::BadState => write_next(fd, &0u8),
             DkgFailure::MissingPublicShares(shares) => {
                 write_next(fd, &1u8)?;
-                let shares: HashSet<u32> = shares.into();
                 shares.inner_consensus_serialize(fd)
             }
             DkgFailure::BadPublicShares(shares) => {
                 write_next(fd, &2u8)?;
-                let shares: HashSet<u32> = shares.into();
                 shares.inner_consensus_serialize(fd)
             }
             DkgFailure::MissingPrivateShares(shares) => {
                 write_next(fd, &3u8)?;
-                let shares: HashSet<u32> = shares.into();
                 shares.inner_consensus_serialize(fd)
             }
             DkgFailure::BadPrivateShares(shares) => {
@@ -352,15 +349,15 @@ impl StacksMessageCodecExtensions for DkgFailure {
             0 => DkgFailure::BadState,
             1 => {
                 let set = HashSet::<u32>::inner_consensus_deserialize(fd)?;
-                DkgFailure::MissingPublicShares(set.into())
+                DkgFailure::MissingPublicShares(set)
             }
             2 => {
                 let set = HashSet::<u32>::inner_consensus_deserialize(fd)?;
-                DkgFailure::BadPublicShares(set.into())
+                DkgFailure::BadPublicShares(set)
             }
             3 => {
                 let set = HashSet::<u32>::inner_consensus_deserialize(fd)?;
-                DkgFailure::MissingPrivateShares(set.into())
+                DkgFailure::MissingPrivateShares(set)
             }
             4 => {
                 let mut map = HashMap::new();
@@ -370,7 +367,7 @@ impl StacksMessageCodecExtensions for DkgFailure {
                     let bad_share = BadPrivateShare::inner_consensus_deserialize(fd)?;
                     map.insert(i, bad_share);
                 }
-                DkgFailure::BadPrivateShares(map.into())
+                DkgFailure::BadPrivateShares(map)
             }
             _ => {
                 return Err(CodecError::DeserializeError(format!(
