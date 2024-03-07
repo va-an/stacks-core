@@ -41,7 +41,8 @@ pub extern crate rstest_reuse;
 #[macro_use]
 extern crate stacks_common;
 
-#[cfg(test)]
+#[cfg(any(test, feature = "testing"))]
+#[macro_use]
 pub mod proptesting;
 
 pub use stacks_common::{

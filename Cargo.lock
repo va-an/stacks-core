@@ -730,7 +730,6 @@ version = "0.0.1"
 dependencies = [
  "assert-json-diff",
  "clarity",
- "hashbrown 0.14.3",
  "integer-sqrt",
  "lazy_static",
  "proptest",
@@ -2775,7 +2774,6 @@ checksum = "c08c74e62047bb2de4ff487b251e4a92e24f48745648451635cec7d591162d9f"
 name = "relay-server"
 version = "0.0.1"
 dependencies = [
- "hashbrown 0.14.3",
  "stacks-common",
 ]
 
@@ -3485,7 +3483,6 @@ dependencies = [
  "base64 0.12.3",
  "chrono",
  "clarity",
- "hashbrown 0.14.3",
  "http-types",
  "lazy_static",
  "libc",
@@ -3556,7 +3553,6 @@ dependencies = [
  "criterion",
  "curve25519-dalek 2.0.0",
  "ed25519-dalek",
- "hashbrown 0.14.3",
  "integer-sqrt",
  "lazy_static",
  "libc",
@@ -3567,6 +3563,7 @@ dependencies = [
  "percent-encoding",
  "pox-locking",
  "prometheus",
+ "proptest",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
  "rand_core 0.6.4",
