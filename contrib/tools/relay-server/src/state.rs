@@ -1,4 +1,4 @@
-use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
+use stacks_common::types::StacksHashMap as HashMap;
 
 #[derive(Default)]
 pub struct State {

@@ -25,7 +25,7 @@ use slog::{slog_debug, slog_warn};
 use stacks_common::codec::{read_next, StacksMessageCodec};
 use stacks_common::consts::SIGNER_SLOTS_PER_USER;
 use stacks_common::types::chainstate::StacksPrivateKey;
-use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
+use stacks_common::types::StacksHashMap as HashMap;
 use stacks_common::{debug, warn};
 
 use super::ClientError;
