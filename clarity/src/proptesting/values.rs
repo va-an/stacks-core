@@ -1,8 +1,12 @@
 use proptest::prelude::*;
 
-use crate::vm::{types::{BuffData, CharType, ListData, ListTypeData, OptionalData, PrincipalData, QualifiedContractIdentifier, ResponseData, SequenceData, SequenceSubtype, StandardPrincipalData, StringSubtype, TupleData, TupleTypeSignature, TypeSignature, UTF8Data}, ContractName, Value};
-
 use super::*;
+use crate::vm::types::{
+    BuffData, CharType, ListData, ListTypeData, OptionalData, PrincipalData,
+    QualifiedContractIdentifier, ResponseData, SequenceData, SequenceSubtype,
+    StandardPrincipalData, StringSubtype, TupleData, TupleTypeSignature, TypeSignature, UTF8Data,
+};
+use crate::vm::{ContractName, Value};
 
 /// Returns a [`Strategy`] for generating a randomized [`Value`] instance of a
 /// the specified ([`TypeSignature`]).
@@ -135,7 +139,7 @@ pub fn response(ok_ty: TypeSignature, err_ty: TypeSignature) -> impl Strategy<Va
 }
 
 /// Returns a [`Strategy`] for generating a randomized [`Value`] instance of variant
-/// [`Value::Sequence`] with the inner type being a list ([`SequenceData`]) of 
+/// [`Value::Sequence`] with the inner type being a list ([`SequenceData`]) of
 /// the specified [`ListTypeData`].
 pub fn list(list_type_data: ListTypeData) -> impl Strategy<Value = Value> {
     prop::collection::vec(

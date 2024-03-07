@@ -1,8 +1,8 @@
 use proptest::prelude::*;
 
-use crate::vm::{representations::{Span, TraitDefinition}, ClarityName, ContractName, SymbolicExpression, SymbolicExpressionType};
-
 use super::*;
+use crate::vm::representations::{Span, TraitDefinition};
+use crate::vm::{ClarityName, ContractName, SymbolicExpression, SymbolicExpressionType};
 
 /// Returns a [`Strategy`] for randomly generating a [`ClarityName`].
 pub fn clarity_name() -> impl Strategy<Value = ClarityName> {
@@ -33,13 +33,8 @@ pub fn symbolic_expression() -> impl Strategy<Value = SymbolicExpression> {
             .prop_map(|(n, t)| SymbolicExpression::trait_reference(n, t)),
     ];
 
-    leaf.prop_recursive(
-        3, 
-        64, 
-        5, 
-        |inner| 
-            prop::collection::vec(inner, 1..3)
-                .prop_map(|list| 
-                    SymbolicExpression::list(list.into_boxed_slice()))
-    )
+    leaf.prop_recursive(3, 64, 5, |inner| {
+        prop::collection::vec(inner, 1..3)
+            .prop_map(|list| SymbolicExpression::list(list.into_boxed_slice()))
+    })
 }

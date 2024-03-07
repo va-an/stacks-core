@@ -1,6 +1,6 @@
 use std::hash::Hash;
 
-use proptest::collection::{VecStrategy, VecValueTree, SizeRange};
+use proptest::collection::{SizeRange, VecStrategy, VecValueTree};
 use proptest::prelude::*;
 use proptest::strategy::{statics, NewTree, ValueTree};
 use proptest::test_runner::TestRunner;
@@ -13,9 +13,7 @@ struct MinSize(usize);
 #[derive(Clone, Copy, Debug)]
 struct VecToStacksHashSet;
 
-impl<T: std::fmt::Debug + Hash + Eq> statics::MapFn<Vec<T>>
-    for VecToStacksHashSet
-{
+impl<T: std::fmt::Debug + Hash + Eq> statics::MapFn<Vec<T>> for VecToStacksHashSet {
     type Output = StacksHashSet<T>;
     fn apply(&self, vec: Vec<T>) -> StacksHashSet<T> {
         vec.into_iter().collect()
@@ -82,7 +80,10 @@ where
 {
     let size = size.into();
     StacksHashSetStrategy(statics::Filter::new(
-        statics::Map::new(proptest::collection::vec(element, size.clone()), VecToStacksHashSet),
+        statics::Map::new(
+            proptest::collection::vec(element, size.clone()),
+            VecToStacksHashSet,
+        ),
         "HashSet minimum size".into(),
         MinSize(size.start()),
     ))

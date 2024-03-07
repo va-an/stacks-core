@@ -1,12 +1,11 @@
 use std::hash::Hash;
 
-use proptest::strategy::{statics, Strategy, ValueTree, NewTree};
-use proptest::collection::{VecStrategy, VecValueTree, SizeRange};
-use proptest::tuple::TupleValueTree;
+use proptest::collection::{SizeRange, VecStrategy, VecValueTree};
+use proptest::strategy::{statics, NewTree, Strategy, ValueTree};
 use proptest::test_runner::TestRunner;
+use proptest::tuple::TupleValueTree;
 
 use crate::types::StacksHashMap;
-
 
 #[derive(Debug, Clone, Copy)]
 struct MinSize(usize);
@@ -31,7 +30,6 @@ where
     K: ValueTree,
     V: ValueTree,
     K::Value: Hash + Eq;
-
 
 impl<K, V> Strategy for StacksHashMapStrategy<K, V>
 where
@@ -67,8 +65,8 @@ where
 #[derive(Clone, Copy, Debug)]
 struct VecToStacksHashMap;
 
-impl<K: std::fmt::Debug + Hash + Eq, V: std::fmt::Debug>
-    statics::MapFn<Vec<(K, V)>> for VecToStacksHashMap
+impl<K: std::fmt::Debug + Hash + Eq, V: std::fmt::Debug> statics::MapFn<Vec<(K, V)>>
+    for VecToStacksHashMap
 {
     type Output = StacksHashMap<K, V>;
     fn apply(&self, vec: Vec<(K, V)>) -> StacksHashMap<K, V> {
@@ -86,7 +84,10 @@ where
 {
     let size = size.into();
     StacksHashMapStrategy(statics::Filter::new(
-        statics::Map::new(proptest::collection::vec((key, value), size.clone()), VecToStacksHashMap),
+        statics::Map::new(
+            proptest::collection::vec((key, value), size.clone()),
+            VecToStacksHashMap,
+        ),
         "HashMap minimum size".into(),
         MinSize(size.start()),
     ))

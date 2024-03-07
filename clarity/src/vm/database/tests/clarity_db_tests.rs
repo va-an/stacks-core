@@ -1,9 +1,9 @@
+use proptest::prelude::*;
 use rusqlite::NO_PARAMS;
 use stacks_common::proptesting::sha_512_trunc_256_sum;
 use stacks_common::util::hash::Sha512Trunc256Sum;
-use proptest::prelude::*;
-use crate::proptesting::*;
 
+use crate::proptesting::*;
 use crate::vm::contracts::Contract;
 use crate::vm::database::clarity_store::ContractCommitment;
 use crate::vm::database::{
@@ -19,7 +19,7 @@ proptest! {
         let mut db = ClarityDatabase::new(&mut store, &NULL_HEADER_DB, &NULL_BURN_STATE_DB);
 
         db.begin();
-        
+
         let contract_id = contract.contract_context.contract_identifier.clone();
 
         db.insert_contract(&contract_id, contract)
@@ -152,8 +152,6 @@ proptest! {
         .expect_err("expected not-nested error");
     }
 }
-
-
 
 /// Returns the number of rows in the metadata table for the provided key.
 fn sql_metadata_table_key_count<S: ClarityBackingStore>(store: &mut S, key: &str) -> u32 {
