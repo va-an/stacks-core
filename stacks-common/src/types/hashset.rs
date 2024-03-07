@@ -54,6 +54,17 @@ where
     }
 }
 
+impl<T> Iterator for &StacksHashSet<T>
+where
+    T: Eq + Hash + Clone,
+{
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.clone().into_iter().next()
+    }
+}
+
 impl<T> FromIterator<T> for StacksHashSet<T>
 where
     T: Eq + Hash,

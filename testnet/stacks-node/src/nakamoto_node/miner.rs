@@ -359,10 +359,7 @@ impl BlockMinerThread {
                 _ => {} // Any other message is ignored
             }
         }
-        Ok(filtered_transactions
-            .iter()
-            .map(|(_, v)| v.clone())
-            .collect())
+        Ok(filtered_transactions.into_values().collect())
     }
 
     fn wait_for_signer_signature(

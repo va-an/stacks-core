@@ -300,7 +300,7 @@ impl StacksMessageCodecExtensions for BadPrivateShare {
 impl StacksMessageCodecExtensions for HashSet<u32> {
     fn inner_consensus_serialize<W: Write>(&self, fd: &mut W) -> Result<(), CodecError> {
         write_next(fd, &(self.len() as u32))?;
-        for i in self.clone() {
+        for i in self {
             write_next(fd, &i)?;
         }
         Ok(())
@@ -551,8 +551,8 @@ impl StacksMessageCodecExtensions for DkgPrivateShares {
                 let share: Vec<u8> = read_next(fd)?;
                 share_map.insert(id, share);
             }
-            let share_map: hashbrown::HashMap<_, _> = share_map.into();
-            shares.push((id, share_map));
+            //let share_map: hashbrown::HashMap<_, _> = share_map.into();
+            shares.push((id, share_map.into()));
         }
         Ok(DkgPrivateShares {
             dkg_id,

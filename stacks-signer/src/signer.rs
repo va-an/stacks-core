@@ -177,23 +177,8 @@ impl From<SignerConfig> for Signer {
             dkg_end_timeout: signer_config.dkg_end_timeout,
             nonce_timeout: signer_config.nonce_timeout,
             sign_timeout: signer_config.sign_timeout,
-            signer_key_ids: signer_config
-                .signer_entries
-                .coordinator_key_ids
-                .iter()
-                .map(|(k, v)| {
-                    (
-                        k.clone(),
-                        v.clone().into_iter().collect::<hashbrown::HashSet<_>>(),
-                    )
-                })
-                .collect::<hashbrown::HashMap<_, _>>(),
-            signer_public_keys: signer_config
-                .signer_entries
-                .signer_public_keys
-                .iter()
-                .map(|(k, v)| (k.clone(), v.clone()))
-                .collect::<hashbrown::HashMap<_, _>>(),
+            signer_key_ids: signer_config.signer_entries.coordinator_key_ids.into(),
+            signer_public_keys: signer_config.signer_entries.signer_public_keys.into(),
         };
 
         let coordinator = FireCoordinator::new(coordinator_config);
@@ -227,8 +212,7 @@ impl From<SignerConfig> for Signer {
             signer_addresses: signer_config
                 .signer_entries
                 .signer_ids
-                .iter()
-                .map(|(k, _)| k.clone())
+                .into_keys()
                 .collect(),
             signer_slot_ids: signer_config.signer_slot_ids.clone(),
             next_signer_slot_ids: vec![],
@@ -764,10 +748,7 @@ impl Signer {
             transactions,
         );
         // We only allow enforcement of one special cased transaction per signer address per block
-        Ok(filtered_transactions
-            .iter()
-            .map(|(_, v)| v.clone())
-            .collect())
+        Ok(filtered_transactions.into_values().collect())
     }
 
     /// Determine the vote for a block and update the block info and nonce request accordingly
@@ -922,7 +903,7 @@ impl Signer {
                     epoch,
                     signer_transactions,
                     new_transaction,
-                ) {
+                ) { 
                     warn!(
                         "Signer #{}: Failed to broadcast DKG public key vote ({dkg_public_key:?}): {e:?}",
                         self.signer_id

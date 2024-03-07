@@ -20,7 +20,7 @@ use std::net::SocketAddr;
 
 use stacks_common::codec::MAX_MESSAGE_LEN;
 use stacks_common::deps_common::httparse;
-use stacks_common::types::{StacksHashMap as HashMap, StacksHashSet as HashSet};
+use stacks_common::types::StacksHashMap as HashMap;
 use stacks_common::util::chunked_encoding::*;
 
 use crate::error::{EventError, RPCError};
