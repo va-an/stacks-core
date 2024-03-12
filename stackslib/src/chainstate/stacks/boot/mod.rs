@@ -228,6 +228,8 @@ pub struct RewardSet {
     #[serde(skip_serializing_if = "Option::is_none", default)]
     // only generated for nakamoto reward sets
     pub signers: Option<Vec<NakamotoSignerEntry>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pox_stx_threshold: Option<u128>,
 }
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
@@ -260,6 +262,7 @@ impl RewardSet {
                 missed_reward_slots: vec![],
             },
             signers: None,
+            pox_stx_threshold: None,
         }
     }
 
@@ -843,6 +846,7 @@ impl StacksChainState {
                 missed_reward_slots: missed_slots,
             },
             signers: signer_set,
+            pox_stx_threshold: Some(threshold),
         }
     }
 
